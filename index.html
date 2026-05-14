@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nutrient Balance Calculator — ESP-Biogeochem Lab</title>
+<title>Soil Nutrient Balance Calculator — Department of Soil Science, BAU</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -11,9 +12,6 @@
     --green-mid: #2d6a4f;
     --green-light: #52b788;
     --green-pale: #d8f3dc;
-    --amber: #e9c46a;
-    --amber-dark: #f4a261;
-    --red-soft: #e76f51;
     --neutral-50: #f8f7f4;
     --neutral-100: #eeecea;
     --neutral-200: #d6d3ce;
@@ -27,445 +25,589 @@
     --mono: 'DM Mono', monospace;
   }
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    font-family: var(--sans);
-    background: var(--neutral-50);
-    color: var(--neutral-900);
-    min-height: 100vh;
-    font-size: 15px;
-    line-height: 1.6;
-  }
+body {
+font-family: var(–sans);
+background: var(–neutral-50);
+color: var(–neutral-900);
+min-height: 100vh;
+font-size: 15px;
+line-height: 1.6;
+}
 
-  /* ── Header ── */
-  .site-header {
-    background: var(--green-dark);
-    color: white;
-    padding: 2rem 2.5rem 1.75rem;
-    position: relative;
-    overflow: hidden;
-  }
-  .site-header::after {
-    content: '';
-    position: absolute;
-    bottom: 0; right: 0;
-    width: 320px; height: 320px;
-    background: radial-gradient(circle, rgba(82,183,136,0.15) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .header-label {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--green-light);
-    margin-bottom: 0.5rem;
-  }
-  .header-title {
-    font-family: var(--serif);
-    font-size: 2.2rem;
-    font-weight: 400;
-    line-height: 1.2;
-    margin-bottom: 0.5rem;
-  }
-  .header-sub {
-    font-size: 13.5px;
-    color: rgba(255,255,255,0.65);
-    max-width: 600px;
-  }
-  .header-meta {
-    display: flex;
-    gap: 2rem;
-    margin-top: 1.25rem;
-    flex-wrap: wrap;
-  }
-  .meta-item {
-    font-size: 12px;
-    color: rgba(255,255,255,0.5);
-    font-family: var(--mono);
-  }
-  .meta-item strong {
-    color: rgba(255,255,255,0.85);
-    font-weight: 500;
-  }
+/* ── Header ── */
+.site-header {
+background: var(–green-dark);
+color: white;
+padding: 2.25rem 2.5rem 2rem;
+position: relative;
+overflow: hidden;
+}
+.site-header::after {
+content: ‘’;
+position: absolute;
+bottom: 0; right: 0;
+width: 380px; height: 380px;
+background: radial-gradient(circle, rgba(82,183,136,0.12) 0%, transparent 70%);
+pointer-events: none;
+}
+.header-label {
+font-family: var(–mono);
+font-size: 11px;
+letter-spacing: 0.12em;
+text-transform: uppercase;
+color: var(–green-light);
+margin-bottom: 0.5rem;
+}
+.header-title {
+font-family: var(–serif);
+font-size: 2.4rem;
+font-weight: 400;
+line-height: 1.2;
+margin-bottom: 0.6rem;
+}
+.header-sub {
+font-size: 13.5px;
+color: rgba(255,255,255,0.65);
+max-width: 640px;
+line-height: 1.7;
+}
+.header-meta {
+display: flex;
+gap: 2rem;
+margin-top: 1.25rem;
+flex-wrap: wrap;
+}
+.meta-item {
+font-size: 12px;
+color: rgba(255,255,255,0.5);
+font-family: var(–mono);
+}
+.meta-item strong { color: rgba(255,255,255,0.85); font-weight: 500; }
 
-  /* ── Crop Tabs ── */
-  .crop-nav {
-    background: white;
-    border-bottom: 1px solid var(--neutral-200);
-    padding: 0 2.5rem;
-    display: flex;
-    gap: 0;
-    overflow-x: auto;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  }
-  .crop-tab {
-    padding: 1rem 1.5rem 0.875rem;
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-family: var(--sans);
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--neutral-400);
-    border-bottom: 2.5px solid transparent;
-    white-space: nowrap;
-    transition: color 0.2s, border-color 0.2s;
-    line-height: 1.4;
-    text-align: left;
-  }
-  .crop-tab:hover { color: var(--neutral-700); }
-  .crop-tab.active {
-    color: var(--green-mid);
-    border-bottom-color: var(--green-mid);
-  }
-  .crop-tab .tab-scientific {
-    display: block;
-    font-size: 10.5px;
-    font-style: italic;
-    font-weight: 400;
-    opacity: 0.75;
-    margin-top: 1px;
-  }
-  .crop-tab .tab-season {
-    display: block;
-    font-size: 10px;
-    font-weight: 400;
-    font-family: var(--mono);
-    margin-top: 1px;
-    letter-spacing: 0.03em;
-  }
+/* ── Attribution banner ── */
+.attribution-bar {
+background: #0f2a1d;
+border-bottom: 1px solid rgba(82,183,136,0.2);
+padding: 0.875rem 2.5rem;
+display: flex;
+align-items: center;
+gap: 1rem;
+flex-wrap: wrap;
+}
+.attr-icon {
+width: 28px; height: 28px;
+border-radius: 50%;
+background: rgba(82,183,136,0.15);
+border: 1px solid rgba(82,183,136,0.3);
+display: flex; align-items: center; justify-content: center;
+flex-shrink: 0;
+}
+.attr-icon svg { width: 14px; height: 14px; fill: var(–green-light); }
+.attr-text {
+font-size: 12.5px;
+color: rgba(255,255,255,0.7);
+font-family: var(–mono);
+line-height: 1.5;
+}
+.attr-text strong { color: var(–green-light); font-weight: 500; }
 
-  /* ── Main layout ── */
-  .main-wrapper {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem 2.5rem;
-    display: grid;
-    grid-template-columns: 340px 1fr;
-    gap: 2rem;
-    align-items: start;
-  }
+/* ── Crop Tabs ── */
+.crop-nav {
+background: white;
+border-bottom: 1px solid var(–neutral-200);
+padding: 0 2.5rem;
+display: flex;
+gap: 0;
+overflow-x: auto;
+position: sticky;
+top: 0;
+z-index: 100;
+box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.crop-tab {
+padding: 1rem 1.5rem 0.875rem;
+border: none;
+background: none;
+cursor: pointer;
+font-family: var(–sans);
+font-size: 14px;
+font-weight: 500;
+color: var(–neutral-400);
+border-bottom: 2.5px solid transparent;
+white-space: nowrap;
+transition: color 0.2s, border-color 0.2s;
+line-height: 1.4;
+text-align: left;
+}
+.crop-tab:hover { color: var(–neutral-700); }
+.crop-tab.active { color: var(–green-mid); border-bottom-color: var(–green-mid); }
+.crop-tab .tab-scientific { display: block; font-size: 10.5px; font-style: italic; font-weight: 400; opacity: 0.75; margin-top: 1px; }
+.crop-tab .tab-season { display: block; font-size: 10px; font-weight: 400; font-family: var(–mono); margin-top: 1px; letter-spacing: 0.03em; }
 
-  /* ── Input panel ── */
-  .input-panel {
-    background: white;
-    border: 1px solid var(--neutral-200);
-    border-radius: 12px;
-    overflow: hidden;
-    position: sticky;
-    top: 68px;
-  }
-  .panel-section {
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid var(--neutral-100);
-  }
-  .panel-section:last-of-type { border-bottom: none; }
-  .section-heading {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--neutral-400);
-    margin-bottom: 0.875rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--neutral-100);
-  }
-  .field-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 0.6rem;
-    gap: 0.75rem;
-  }
-  .field-row:last-child { margin-bottom: 0; }
-  .field-label {
-    font-size: 13px;
-    color: var(--neutral-700);
-    flex: 1;
-    line-height: 1.3;
-  }
-  .field-unit {
-    font-size: 11px;
-    color: var(--neutral-400);
-    font-family: var(--mono);
-    margin-left: 2px;
-  }
-  .field-input {
-    width: 90px;
-    padding: 5px 8px;
-    border: 1px solid var(--neutral-200);
-    border-radius: 6px;
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--neutral-900);
-    background: var(--neutral-50);
-    text-align: right;
-    transition: border-color 0.15s;
-    flex-shrink: 0;
-  }
-  .field-input:focus {
-    outline: none;
-    border-color: var(--green-mid);
-    background: white;
-  }
-  .field-input.computed {
-    background: var(--green-pale);
-    border-color: transparent;
-    color: var(--green-dark);
-    pointer-events: none;
-  }
-  .calc-btn {
-    display: block;
-    width: calc(100% - 3rem);
-    margin: 1.25rem 1.5rem;
-    padding: 0.875rem;
-    background: var(--green-mid);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-family: var(--sans);
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    letter-spacing: 0.02em;
-    transition: background 0.2s;
-  }
-  .calc-btn:hover { background: var(--green-dark); }
+/* ── Main layout ── */
+.main-wrapper {
+max-width: 1280px;
+margin: 0 auto;
+padding: 2rem 2.5rem;
+display: grid;
+grid-template-columns: 340px 1fr;
+gap: 2rem;
+align-items: start;
+}
 
-  /* ── Results panel ── */
-  .results-panel { display: flex; flex-direction: column; gap: 1.5rem; }
+/* ── Input panel ── */
+.input-panel {
+background: white;
+border: 1px solid var(–neutral-200);
+border-radius: 12px;
+overflow: hidden;
+position: sticky;
+top: 68px;
+}
+.panel-section { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(–neutral-100); }
+.panel-section:last-of-type { border-bottom: none; }
+.section-heading {
+font-family: var(–mono);
+font-size: 10px;
+letter-spacing: 0.12em;
+text-transform: uppercase;
+color: var(–neutral-400);
+margin-bottom: 0.875rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid var(–neutral-100);
+}
+.field-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem; gap: 0.75rem; }
+.field-row:last-child { margin-bottom: 0; }
+.field-label { font-size: 13px; color: var(–neutral-700); flex: 1; line-height: 1.3; }
+.field-unit { font-size: 11px; color: var(–neutral-400); font-family: var(–mono); margin-left: 2px; }
+.field-input {
+width: 90px; padding: 5px 8px;
+border: 1px solid var(–neutral-200); border-radius: 6px;
+font-family: var(–mono); font-size: 13px; color: var(–neutral-900);
+background: var(–neutral-50); text-align: right;
+transition: border-color 0.15s; flex-shrink: 0;
+}
+.field-input:focus { outline: none; border-color: var(–green-mid); background: white; }
+.field-input.computed { background: var(–green-pale); border-color: transparent; color: var(–green-dark); pointer-events: none; }
+.calc-btn {
+display: block; width: calc(100% - 3rem); margin: 1.25rem 1.5rem; padding: 0.875rem;
+background: var(–green-mid); color: white; border: none; border-radius: 8px;
+font-family: var(–sans); font-size: 14px; font-weight: 600; cursor: pointer;
+letter-spacing: 0.02em; transition: background 0.2s;
+}
+.calc-btn:hover { background: var(–green-dark); }
 
-  .results-placeholder {
-    background: white;
-    border: 1.5px dashed var(--neutral-200);
-    border-radius: 12px;
-    padding: 3rem 2rem;
-    text-align: center;
-    color: var(--neutral-400);
-  }
-  .results-placeholder .placeholder-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    opacity: 0.4;
-  }
-  .results-placeholder p {
-    font-size: 14px;
-    font-style: italic;
-  }
+/* ── Results panel ── */
+.results-panel { display: flex; flex-direction: column; gap: 1.75rem; }
 
-  .result-block {
-    background: white;
-    border: 1px solid var(--neutral-200);
-    border-radius: 12px;
-    overflow: hidden;
-    display: none;
-  }
-  .result-block.visible { display: block; }
+.results-placeholder {
+background: white; border: 1.5px dashed var(–neutral-200);
+border-radius: 12px; padding: 3rem 2rem; text-align: center; color: var(–neutral-400);
+}
+.results-placeholder .placeholder-icon { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.4; }
+.results-placeholder p { font-size: 14px; font-style: italic; }
 
-  .block-header {
-    padding: 1rem 1.5rem;
-    background: var(--neutral-50);
-    border-bottom: 1px solid var(--neutral-100);
-    display: flex;
-    align-items: baseline;
-    gap: 0.75rem;
-  }
-  .block-title {
-    font-family: var(--serif);
-    font-size: 1.1rem;
-    font-weight: 400;
-    color: var(--neutral-900);
-  }
-  .block-element {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--neutral-400);
-    letter-spacing: 0.08em;
-  }
+/* ── Crop info bar ── */
+.crop-info-bar {
+background: var(–green-pale); border: 1px solid #b7e4c7;
+border-radius: 8px; padding: 0.75rem 1.25rem;
+display: none; gap: 2rem; flex-wrap: wrap; align-items: center;
+}
+.crop-info-bar.visible { display: flex; }
+.cib-item { font-size: 12.5px; color: var(–green-dark); }
+.cib-label { font-family: var(–mono); font-size: 10px; color: var(–green-mid); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1px; }
 
-  .balance-summary {
-    padding: 1rem 1.5rem;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    border-bottom: 1px solid var(--neutral-100);
-  }
-  .summary-card {
-    text-align: center;
-    padding: 0.75rem;
-    border-radius: 8px;
-    background: var(--neutral-50);
-  }
-  .summary-card .s-label {
-    font-size: 11px;
-    font-family: var(--mono);
-    color: var(--neutral-400);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 0.25rem;
-  }
-  .summary-card .s-value {
-    font-family: var(--mono);
-    font-size: 1.4rem;
-    font-weight: 500;
-    color: var(--neutral-900);
-  }
-  .summary-card.positive .s-value { color: var(--positive); }
-  .summary-card.negative .s-value { color: var(--negative); }
+/* ── Balance flow visual ── */
+.balance-flow {
+display: none;
+background: white;
+border: 1px solid var(–neutral-200);
+border-radius: 12px;
+overflow: hidden;
+}
+.balance-flow.visible { display: block; }
+.flow-header {
+padding: 0.875rem 1.5rem;
+border-bottom: 1px solid var(–neutral-100);
+background: var(–neutral-50);
+}
+.flow-header-title {
+font-family: var(–mono);
+font-size: 10px;
+letter-spacing: 0.12em;
+text-transform: uppercase;
+color: var(–neutral-400);
+}
+.flow-grid {
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 0;
+}
+.flow-nutrient {
+border-right: 1px solid var(–neutral-100);
+padding: 1.25rem;
+}
+.flow-nutrient:last-child { border-right: none; }
+.flow-nutrient-name {
+font-family: var(–serif);
+font-size: 1rem;
+color: var(–neutral-900);
+margin-bottom: 1rem;
+}
+.flow-row {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 0.4rem;
+}
+.flow-label {
+font-size: 11.5px;
+color: var(–neutral-400);
+font-family: var(–mono);
+}
+.flow-val {
+font-size: 12.5px;
+font-family: var(–mono);
+font-weight: 500;
+color: var(–neutral-700);
+}
+.flow-divider {
+height: 1px;
+background: var(–neutral-100);
+margin: 0.6rem 0;
+position: relative;
+}
+.flow-divider::after {
+content: ‘=’;
+position: absolute;
+right: 0;
+top: -9px;
+font-family: var(–mono);
+font-size: 13px;
+color: var(–neutral-400);
+background: white;
+padding: 0 2px;
+}
+.flow-balance {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-top: 0.5rem;
+padding: 0.5rem 0.6rem;
+border-radius: 6px;
+}
+.flow-balance.pos { background: #f0faf4; }
+.flow-balance.neg { background: #fff5f5; }
+.flow-balance-label { font-size: 11px; font-family: var(–mono); color: var(–neutral-400); text-transform: uppercase; letter-spacing: 0.08em; }
+.flow-balance-val { font-family: var(–mono); font-size: 1.1rem; font-weight: 600; }
+.flow-balance.pos .flow-balance-val { color: var(–positive); }
+.flow-balance.neg .flow-balance-val { color: var(–negative); }
 
-  .breakdown-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-  .breakdown-table th {
-    padding: 0.6rem 1.5rem;
-    text-align: left;
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--neutral-400);
-    background: var(--neutral-50);
-    border-bottom: 1px solid var(--neutral-100);
-  }
-  .breakdown-table th:last-child { text-align: right; }
-  .breakdown-table td {
-    padding: 0.55rem 1.5rem;
-    border-bottom: 1px solid var(--neutral-100);
-    color: var(--neutral-700);
-  }
-  .breakdown-table td:last-child {
-    text-align: right;
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--neutral-900);
-  }
-  .breakdown-table tr:last-child td { border-bottom: none; }
-  .breakdown-table .total-row td {
-    font-weight: 600;
-    background: var(--neutral-50);
-    color: var(--neutral-900);
-    border-top: 1px solid var(--neutral-200);
-  }
-  .breakdown-table .balance-row td {
-    font-weight: 600;
-    font-family: var(--mono);
-  }
-  .breakdown-table .balance-row.pos td { color: var(--positive); background: #f0faf4; }
-  .breakdown-table .balance-row.neg td { color: var(--negative); background: #fff5f5; }
-  .row-indent { padding-left: 2.5rem !important; color: var(--neutral-400) !important; font-size: 12px !important; }
+/* ── Horizontal nutrient blocks ── */
+.nutrient-section {
+display: none;
+background: white;
+border: 1px solid var(–neutral-200);
+border-radius: 12px;
+overflow: hidden;
+}
+.nutrient-section.visible { display: block; }
+.ns-header {
+padding: 1rem 1.5rem;
+background: var(–neutral-50);
+border-bottom: 1px solid var(–neutral-100);
+}
+.ns-header-title {
+font-family: var(–serif);
+font-size: 1.15rem;
+font-weight: 400;
+color: var(–neutral-900);
+margin-bottom: 0.2rem;
+}
+.ns-header-sub {
+font-size: 11px;
+color: var(–neutral-400);
+font-family: var(–mono);
+letter-spacing: 0.06em;
+}
 
-  /* ── Recommendation block ── */
-  .rec-block {
-    background: white;
-    border: 1px solid var(--neutral-200);
-    border-radius: 12px;
-    overflow: hidden;
-    display: none;
-  }
-  .rec-block.visible { display: block; }
-  .rec-header {
-    padding: 1rem 1.5rem;
-    background: var(--green-dark);
-    color: white;
-  }
-  .rec-header h3 {
-    font-family: var(--serif);
-    font-size: 1.05rem;
-    font-weight: 400;
-    margin-bottom: 0.2rem;
-  }
-  .rec-header p {
-    font-size: 12px;
-    color: rgba(255,255,255,0.6);
-    font-family: var(--mono);
-  }
-  .rec-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0;
-  }
-  .rec-cell {
-    padding: 1rem 1.25rem;
-    border-right: 1px solid var(--neutral-100);
-    border-bottom: 1px solid var(--neutral-100);
-  }
-  .rec-cell:nth-child(4n) { border-right: none; }
-  .rec-cell:nth-last-child(-n+4) { border-bottom: none; }
-  .rec-cell .rc-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--neutral-400);
-    margin-bottom: 0.25rem;
-  }
-  .rec-cell .rc-val {
-    font-family: var(--mono);
-    font-size: 1.15rem;
-    font-weight: 500;
-    color: var(--neutral-900);
-  }
-  .rc-adj-pos { color: var(--positive) !important; }
-  .rc-adj-neg { color: var(--negative) !important; }
+/* 4-column horizontal nutrient grid */
+.nutrient-cols {
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 0;
+border-bottom: 1px solid var(–neutral-100);
+}
+.nutrient-col {
+padding: 1.25rem 1.25rem 1rem;
+border-right: 1px solid var(–neutral-100);
+}
+.nutrient-col:last-child { border-right: none; }
+.nc-name {
+font-family: var(–serif);
+font-size: 0.95rem;
+color: var(–neutral-900);
+margin-bottom: 0.875rem;
+padding-bottom: 0.5rem;
+border-bottom: 1px solid var(–neutral-100);
+}
+.nc-row {
+display: flex;
+justify-content: space-between;
+align-items: baseline;
+margin-bottom: 0.35rem;
+gap: 0.5rem;
+}
+.nc-label {
+font-size: 11px;
+color: var(–neutral-400);
+line-height: 1.3;
+flex: 1;
+}
+.nc-val {
+font-family: var(–mono);
+font-size: 12px;
+color: var(–neutral-700);
+text-align: right;
+white-space: nowrap;
+}
+.nc-divider { height: 1px; background: var(–neutral-100); margin: 0.6rem 0; }
+.nc-total-row { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; margin-bottom: 0.3rem; }
+.nc-total-label { font-size: 11.5px; font-weight: 500; color: var(–neutral-700); flex: 1; }
+.nc-total-val { font-family: var(–mono); font-size: 12.5px; font-weight: 600; color: var(–neutral-900); }
+.nc-balance {
+margin-top: 0.6rem;
+padding: 0.5rem 0.6rem;
+border-radius: 6px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+.nc-balance.pos { background: #f0faf4; }
+.nc-balance.neg { background: #fff5f5; }
+.nc-bal-label { font-size: 10px; font-family: var(–mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(–neutral-400); }
+.nc-bal-val { font-family: var(–mono); font-size: 1rem; font-weight: 600; }
+.nc-balance.pos .nc-bal-val { color: var(–positive); }
+.nc-balance.neg .nc-bal-val { color: var(–negative); }
 
-  /* ── Crop info badge ── */
-  .crop-info-bar {
-    background: var(--green-pale);
-    border: 1px solid #b7e4c7;
-    border-radius: 8px;
-    padding: 0.75rem 1.25rem;
-    display: none;
-    gap: 2rem;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  .crop-info-bar.visible { display: flex; }
-  .cib-item { font-size: 12.5px; color: var(--green-dark); }
-  .cib-label { font-family: var(--mono); font-size: 10px; color: var(--green-mid); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1px; }
+/* units row at bottom */
+.ns-unit-note {
+padding: 0.5rem 1.5rem;
+font-size: 11px;
+color: var(–neutral-400);
+font-family: var(–mono);
+border-top: 1px solid var(–neutral-100);
+}
 
-  /* ── Footer ── */
-  .site-footer {
-    margin-top: 3rem;
-    padding: 1.5rem 2.5rem;
-    border-top: 1px solid var(--neutral-200);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 12px;
-    color: var(--neutral-400);
-    font-family: var(--mono);
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
+/* ── Recommendation block ── */
+.rec-block {
+background: white; border: 1px solid var(–neutral-200);
+border-radius: 12px; overflow: hidden; display: none;
+}
+.rec-block.visible { display: block; }
+.rec-header { padding: 1rem 1.5rem; background: var(–green-dark); color: white; }
+.rec-header h3 { font-family: var(–serif); font-size: 1.1rem; font-weight: 400; margin-bottom: 0.2rem; }
+.rec-header p { font-size: 12px; color: rgba(255,255,255,0.6); font-family: var(–mono); }
+.rec-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+.rec-cell {
+padding: 1rem 1.25rem;
+border-right: 1px solid var(–neutral-100);
+border-bottom: 1px solid var(–neutral-100);
+}
+.rec-cell:nth-child(4n) { border-right: none; }
+.rec-cell:nth-last-child(-n+4) { border-bottom: none; }
+.rc-label { font-family: var(–mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(–neutral-400); margin-bottom: 0.25rem; }
+.rc-val { font-family: var(–mono); font-size: 1.15rem; font-weight: 500; color: var(–neutral-900); }
+.rc-adj-pos { color: var(–positive) !important; }
+.rc-adj-neg { color: var(–negative) !important; }
+.rec-sub-label { font-family: var(–mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(–neutral-400); margin-bottom: 0.75rem; padding: 0.75rem 1.5rem 0; border-top: 1px solid var(–neutral-100); background: var(–neutral-50); }
 
-  @media (max-width: 900px) {
-    .main-wrapper { grid-template-columns: 1fr; padding: 1.5rem; }
-    .input-panel { position: static; }
-    .rec-grid { grid-template-columns: repeat(2, 1fr); }
-    .balance-summary { grid-template-columns: repeat(3, 1fr); }
-  }
+/* ── Methodology note ── */
+.method-block {
+background: white; border: 1px solid var(–neutral-200);
+border-radius: 12px; overflow: hidden;
+}
+.method-header {
+padding: 1rem 1.5rem;
+background: var(–neutral-50);
+border-bottom: 1px solid var(–neutral-100);
+cursor: pointer;
+display: flex; align-items: center; justify-content: space-between;
+user-select: none;
+}
+.method-header-title { font-family: var(–mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(–neutral-700); }
+.method-toggle { font-size: 18px; color: var(–neutral-400); transition: transform 0.2s; }
+.method-toggle.open { transform: rotate(45deg); }
+.method-body { display: none; padding: 1.5rem; }
+.method-body.open { display: block; }
+.method-body p { font-size: 13px; color: var(–neutral-700); line-height: 1.75; margin-bottom: 0.875rem; }
+.method-body p:last-child { margin-bottom: 0; }
+.method-body strong { color: var(–neutral-900); font-weight: 600; }
+
+/* ── Author section ── */
+.author-section {
+background: var(–green-dark);
+border-radius: 12px;
+overflow: hidden;
+color: white;
+}
+.author-inner {
+display: grid;
+grid-template-columns: auto 1fr;
+gap: 0;
+}
+.author-sidebar {
+background: #0f2a1d;
+padding: 2rem 1.75rem;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 1rem;
+min-width: 160px;
+border-right: 1px solid rgba(255,255,255,0.08);
+}
+.author-avatar {
+width: 72px; height: 72px;
+border-radius: 50%;
+background: rgba(82,183,136,0.2);
+border: 2px solid rgba(82,183,136,0.4);
+display: flex; align-items: center; justify-content: center;
+font-family: var(–serif);
+font-size: 1.6rem;
+color: var(–green-light);
+letter-spacing: -1px;
+}
+.author-role {
+font-family: var(–mono);
+font-size: 10px;
+letter-spacing: 0.1em;
+text-transform: uppercase;
+color: var(–green-light);
+text-align: center;
+line-height: 1.5;
+}
+.author-links { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; margin-top: 0.5rem; }
+.author-link {
+display: flex; align-items: center; gap: 0.5rem;
+padding: 0.4rem 0.6rem;
+border-radius: 6px;
+background: rgba(255,255,255,0.06);
+border: 1px solid rgba(255,255,255,0.1);
+text-decoration: none;
+color: rgba(255,255,255,0.75);
+font-size: 11px;
+font-family: var(–mono);
+transition: background 0.2s, color 0.2s;
+white-space: nowrap;
+}
+.author-link:hover { background: rgba(82,183,136,0.2); color: var(–green-light); border-color: rgba(82,183,136,0.3); }
+.author-link svg { width: 12px; height: 12px; fill: currentColor; flex-shrink: 0; }
+.author-main { padding: 2rem; }
+.author-name {
+font-family: var(–serif);
+font-size: 1.6rem;
+font-weight: 400;
+margin-bottom: 0.25rem;
+color: white;
+}
+.author-affil {
+font-size: 12px;
+font-family: var(–mono);
+color: var(–green-light);
+letter-spacing: 0.05em;
+margin-bottom: 1.25rem;
+}
+.author-bio {
+font-size: 13.5px;
+color: rgba(255,255,255,0.75);
+line-height: 1.8;
+margin-bottom: 1.5rem;
+max-width: 580px;
+}
+.author-attribution {
+background: rgba(0,0,0,0.2);
+border: 1px solid rgba(82,183,136,0.2);
+border-radius: 8px;
+padding: 1rem 1.25rem;
+font-size: 12.5px;
+color: rgba(255,255,255,0.65);
+font-family: var(–mono);
+line-height: 1.7;
+}
+.author-attribution strong { color: var(–green-light); font-weight: 500; }
+
+/* ── Citation block ── */
+.cite-block {
+background: white; border: 1px solid var(–neutral-200); border-radius: 12px; overflow: hidden;
+}
+.cite-header { padding: 0.875rem 1.5rem; background: var(–neutral-50); border-bottom: 1px solid var(–neutral-100); }
+.cite-header-title { font-family: var(–mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(–neutral-400); }
+.cite-body { padding: 1.25rem 1.5rem; }
+.cite-text {
+font-family: var(–mono); font-size: 12.5px; color: var(–neutral-700);
+background: var(–neutral-50); border: 1px solid var(–neutral-200);
+border-radius: 6px; padding: 1rem; line-height: 1.8;
+}
+.cite-note { font-size: 11.5px; color: var(–neutral-400); margin-top: 0.75rem; font-style: italic; }
+
+/* ── Footer ── */
+.site-footer {
+margin-top: 3rem;
+padding: 1.5rem 2.5rem;
+border-top: 1px solid var(–neutral-200);
+display: flex;
+justify-content: space-between;
+align-items: center;
+font-size: 12px;
+color: var(–neutral-400);
+font-family: var(–mono);
+flex-wrap: wrap;
+gap: 0.5rem;
+}
+
+@media (max-width: 960px) {
+.main-wrapper { grid-template-columns: 1fr; padding: 1.5rem; }
+.input-panel { position: static; }
+.nutrient-cols { grid-template-columns: repeat(2, 1fr); }
+.flow-grid { grid-template-columns: repeat(2, 1fr); }
+.rec-grid { grid-template-columns: repeat(2, 1fr); }
+.author-inner { grid-template-columns: 1fr; }
+.author-sidebar { flex-direction: row; flex-wrap: wrap; justify-content: center; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 1.25rem; }
+.author-links { flex-direction: row; width: auto; }
+}
 </style>
+
 </head>
 <body>
 
+<!-- ── HEADER ── -->
+
 <header class="site-header">
-  <div class="header-label">ESP-Biogeochem Lab · Bangladesh Agricultural University</div>
+  <div class="header-label">Department of Soil Science · Bangladesh Agricultural University (BAU) · Mymensingh</div>
   <h1 class="header-title">Soil Nutrient Balance Calculator</h1>
-  <p class="header-sub">A field-validated model for estimating N, P, K and S balances and recommending adjusted fertilizer doses for zero nutrient depletion in major Bangladesh cropping systems.</p>
+  <p class="header-sub">A field-validated regression model for estimating nitrogen, phosphorus, potassium, and sulfur balances and generating adjusted fertilizer recommendations for zero nutrient depletion across major Bangladesh cropping systems.</p>
   <div class="header-meta">
-    <div class="meta-item"><strong>Nutrients</strong> · N, P, K, S</div>
+    <div class="meta-item"><strong>Nutrients</strong> · Nitrogen, Phosphorus, Potassium, Sulfur</div>
     <div class="meta-item"><strong>Crops</strong> · 5 major systems</div>
     <div class="meta-item"><strong>Validated</strong> · Bogura, Cumilla, Mymensingh AEZs</div>
-    <div class="meta-item"><strong>Context</strong> · Bangladesh (generalized)</div>
+    <div class="meta-item"><strong>Version</strong> · 2.0 (2024)</div>
   </div>
 </header>
+
+<!-- ── ATTRIBUTION BANNER ── -->
+
+<div class="attribution-bar">
+  <div class="attr-icon">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2a5 5 0 1 0 0 10A5 5 0 0 0 12 2zm0 12c-5.33 0-8 2.67-8 4v2h16v-2c0-1.33-2.67-4-8-4z"/></svg>
+  </div>
+  <div class="attr-text">
+    <strong>Methodology &amp; equations by Md Kamruzzaman</strong> — The nutrient balance equations, regression coefficients, leaching and gaseous loss models, organic amendment constants, and agronomic parameters in this calculator were independently developed by Md Kamruzzaman, Department of Soil Science, BAU, based on experimental data from three agroecological zones of Bangladesh. This is the author's open-source web implementation of that work.
+  </div>
+</div>
+
+<!-- ── CROP TABS ── -->
 
 <nav class="crop-nav" role="tablist" aria-label="Crop selection">
   <button class="crop-tab active" role="tab" aria-selected="true" onclick="selectCrop('potato',this)">
@@ -495,11 +637,13 @@
   </button>
 </nav>
 
+<!-- ── MAIN LAYOUT ── -->
+
 <main class="main-wrapper">
 
   <!-- INPUT PANEL -->
-  <aside class="input-panel" aria-label="Model inputs">
 
+  <aside class="input-panel" aria-label="Model inputs">
     <div class="panel-section">
       <div class="section-heading">Soil texture</div>
       <div class="field-row">
@@ -516,251 +660,347 @@
       </div>
     </div>
 
-    <div class="panel-section">
-      <div class="section-heading">Soil properties &amp; climate</div>
-      <div class="field-row">
-        <span class="field-label">Rainfall <span class="field-unit">mm</span></span>
-        <input class="field-input" type="number" id="rainfall" value="250" min="0" step="1">
-      </div>
-      <div class="field-row">
-        <span class="field-label">pH</span>
-        <input class="field-input" type="number" id="ph" value="6.8" min="3" max="10" step="0.1">
-      </div>
-      <div class="field-row">
-        <span class="field-label">Mineral N <span class="field-unit">mg kg⁻¹</span></span>
-        <input class="field-input" type="number" id="mineralN" value="10" min="0" step="0.1">
-      </div>
-      <div class="field-row">
-        <span class="field-label">NO₃⁻ <span class="field-unit">mg kg⁻¹</span></span>
-        <input class="field-input" type="number" id="no3" value="6" min="0" step="0.1">
-      </div>
-      <div class="field-row">
-        <span class="field-label">Total N <span class="field-unit">%</span></span>
-        <input class="field-input" type="number" id="totalN" value="0.08" min="0" max="1" step="0.01">
-      </div>
-      <div class="field-row">
-        <span class="field-label">Organic C <span class="field-unit">%</span></span>
-        <input class="field-input" type="number" id="organicC" value="1.0" min="0" max="10" step="0.01">
-      </div>
-    </div>
+```
+<div class="panel-section">
+  <div class="section-heading">Soil properties &amp; climate</div>
+  <div class="field-row">
+    <span class="field-label">Rainfall <span class="field-unit">mm</span></span>
+    <input class="field-input" type="number" id="rainfall" value="250" min="0" step="1">
+  </div>
+  <div class="field-row">
+    <span class="field-label">pH</span>
+    <input class="field-input" type="number" id="ph" value="6.8" min="3" max="10" step="0.1">
+  </div>
+  <div class="field-row">
+    <span class="field-label">Mineral N <span class="field-unit">mg kg⁻¹</span></span>
+    <input class="field-input" type="number" id="mineralN" value="10" min="0" step="0.1">
+  </div>
+  <div class="field-row">
+    <span class="field-label">NO₃⁻ <span class="field-unit">mg kg⁻¹</span></span>
+    <input class="field-input" type="number" id="no3" value="6" min="0" step="0.1">
+  </div>
+  <div class="field-row">
+    <span class="field-label">Total N <span class="field-unit">%</span></span>
+    <input class="field-input" type="number" id="totalN" value="0.08" min="0" max="1" step="0.01">
+  </div>
+  <div class="field-row">
+    <span class="field-label">Organic C <span class="field-unit">%</span></span>
+    <input class="field-input" type="number" id="organicC" value="1.0" min="0" max="10" step="0.01">
+  </div>
+</div>
 
-    <div class="panel-section">
-      <div class="section-heading">Yield</div>
-      <div class="field-row">
-        <span class="field-label" id="grainLabel">Tuber/Grain yield <span class="field-unit">t ha⁻¹</span></span>
-        <input class="field-input" type="number" id="grainYield" value="20" min="0" step="0.1">
-      </div>
-      <div class="field-row">
-        <span class="field-label" id="strawLabel">Haulm/Straw yield <span class="field-unit">t ha⁻¹</span></span>
-        <input class="field-input" type="number" id="strawYield" value="10" min="0" step="0.1">
-      </div>
-    </div>
+<div class="panel-section">
+  <div class="section-heading">Yield</div>
+  <div class="field-row">
+    <span class="field-label" id="grainLabel">Tuber / Grain yield <span class="field-unit">t ha⁻¹</span></span>
+    <input class="field-input" type="number" id="grainYield" value="20" min="0" step="0.1">
+  </div>
+  <div class="field-row">
+    <span class="field-label" id="strawLabel">Haulm / Straw yield <span class="field-unit">t ha⁻¹</span></span>
+    <input class="field-input" type="number" id="strawYield" value="10" min="0" step="0.1">
+  </div>
+</div>
 
-    <div class="panel-section">
-      <div class="section-heading">Applied nutrient rates</div>
-      <div class="field-row">
-        <span class="field-label">N rate <span class="field-unit">kg ha⁻¹</span></span>
-        <input class="field-input" type="number" id="nRate" value="140" min="0" step="1">
-      </div>
-      <div class="field-row">
-        <span class="field-label">P rate <span class="field-unit">kg ha⁻¹</span></span>
-        <input class="field-input" type="number" id="pRate" value="40" min="0" step="1">
-      </div>
-      <div class="field-row">
-        <span class="field-label">K rate <span class="field-unit">kg ha⁻¹</span></span>
-        <input class="field-input" type="number" id="kRate" value="90" min="0" step="1">
-      </div>
-      <div class="field-row">
-        <span class="field-label">S rate <span class="field-unit">kg ha⁻¹</span></span>
-        <input class="field-input" type="number" id="sRate" value="10" min="0" step="1">
-      </div>
-    </div>
+<div class="panel-section">
+  <div class="section-heading">Applied nutrient rates</div>
+  <div class="field-row">
+    <span class="field-label">Nitrogen rate <span class="field-unit">kg ha⁻¹</span></span>
+    <input class="field-input" type="number" id="nRate" value="140" min="0" step="1">
+  </div>
+  <div class="field-row">
+    <span class="field-label">Phosphorus rate <span class="field-unit">kg ha⁻¹</span></span>
+    <input class="field-input" type="number" id="pRate" value="40" min="0" step="1">
+  </div>
+  <div class="field-row">
+    <span class="field-label">Potassium rate <span class="field-unit">kg ha⁻¹</span></span>
+    <input class="field-input" type="number" id="kRate" value="90" min="0" step="1">
+  </div>
+  <div class="field-row">
+    <span class="field-label">Sulfur rate <span class="field-unit">kg ha⁻¹</span></span>
+    <input class="field-input" type="number" id="sRate" value="10" min="0" step="1">
+  </div>
+</div>
 
-    <div class="panel-section">
-      <div class="section-heading">Organic amendments</div>
-      <div class="field-row">
-        <span class="field-label">Cow dung <span class="field-unit">t ha⁻¹</span></span>
-        <input class="field-input" type="number" id="cowDung" value="5" min="0" step="0.1">
-      </div>
-      <div class="field-row">
-        <span class="field-label">Farmyard manure <span class="field-unit">t ha⁻¹</span></span>
-        <input class="field-input" type="number" id="farmyard" value="0" min="0" step="0.1">
-      </div>
-      <div class="field-row">
-        <span class="field-label">Poultry manure <span class="field-unit">t ha⁻¹</span></span>
-        <input class="field-input" type="number" id="poultry" value="0" min="0" step="0.1">
-      </div>
-    </div>
+<div class="panel-section">
+  <div class="section-heading">Organic amendments</div>
+  <div class="field-row">
+    <span class="field-label">Cow dung <span class="field-unit">t ha⁻¹</span></span>
+    <input class="field-input" type="number" id="cowDung" value="5" min="0" step="0.1">
+  </div>
+  <div class="field-row">
+    <span class="field-label">Farmyard manure <span class="field-unit">t ha⁻¹</span></span>
+    <input class="field-input" type="number" id="farmyard" value="0" min="0" step="0.1">
+  </div>
+  <div class="field-row">
+    <span class="field-label">Poultry manure <span class="field-unit">t ha⁻¹</span></span>
+    <input class="field-input" type="number" id="poultry" value="0" min="0" step="0.1">
+  </div>
+</div>
 
-    <div class="panel-section">
-      <div class="section-heading">Crop residue</div>
-      <div class="field-row">
-        <span class="field-label">Residue retained <span class="field-unit">inch</span></span>
-        <input class="field-input" type="number" id="residue" value="0" min="0" step="1">
-      </div>
-    </div>
+<div class="panel-section">
+  <div class="section-heading">Crop residue</div>
+  <div class="field-row">
+    <span class="field-label">Residue retained <span class="field-unit">inch</span></span>
+    <input class="field-input" type="number" id="residue" value="0" min="0" step="1">
+  </div>
+</div>
 
-    <button class="calc-btn" onclick="calculate()">Calculate nutrient balance</button>
+<button class="calc-btn" onclick="calculate()">Calculate nutrient balance</button>
+```
+
   </aside>
 
   <!-- RESULTS PANEL -->
+
   <section class="results-panel" aria-label="Calculation results">
 
-    <!-- Crop info bar -->
-    <div class="crop-info-bar" id="cropInfoBar">
-      <div class="cib-item"><div class="cib-label">Crop system</div><span id="cibName">—</span></div>
-      <div class="cib-item"><div class="cib-label">Season type</div><span id="cibSeason">—</span></div>
-      <div class="cib-item"><div class="cib-label">Growing period</div><span id="cibPeriod">—</span></div>
-      <div class="cib-item"><div class="cib-label">Moisture basis</div><span id="cibMoisture">—</span></div>
+```
+<div class="results-placeholder" id="placeholder">
+  <div class="placeholder-icon">⚖</div>
+  <p>Enter field parameters and press <strong>Calculate</strong> to generate nutrient balance estimates.</p>
+</div>
+
+<!-- Crop info bar -->
+<div class="crop-info-bar" id="cropInfoBar">
+  <div class="cib-item"><div class="cib-label">Crop system</div><span id="cibName">—</span></div>
+  <div class="cib-item"><div class="cib-label">Season type</div><span id="cibSeason">—</span></div>
+  <div class="cib-item"><div class="cib-label">Growing period</div><span id="cibPeriod">—</span></div>
+  <div class="cib-item"><div class="cib-label">Moisture basis</div><span id="cibMoisture">—</span></div>
+</div>
+
+<!-- Balance flow visual: Input − Output = Balance for all 4 nutrients -->
+<div class="balance-flow" id="balanceFlow">
+  <div class="flow-header">
+    <div class="flow-header-title">Nutrient balance summary — Input − Output = Balance (kg ha⁻¹)</div>
+  </div>
+  <div class="flow-grid">
+    <div class="flow-nutrient">
+      <div class="flow-nutrient-name">Nitrogen</div>
+      <div class="flow-row"><span class="flow-label">Total input</span><span class="flow-val" id="fNin">—</span></div>
+      <div class="flow-row"><span class="flow-label">Total output</span><span class="flow-val" id="fNout">—</span></div>
+      <div class="flow-divider"></div>
+      <div class="flow-balance" id="fNbalCard">
+        <span class="flow-balance-label">Balance</span>
+        <span class="flow-balance-val" id="fNbal">—</span>
+      </div>
     </div>
-
-    <div class="results-placeholder" id="placeholder">
-      <div class="placeholder-icon">⚖</div>
-      <p>Enter field parameters and press <strong>Calculate</strong> to generate nutrient balance estimates.</p>
+    <div class="flow-nutrient">
+      <div class="flow-nutrient-name">Phosphorus</div>
+      <div class="flow-row"><span class="flow-label">Total input</span><span class="flow-val" id="fPin">—</span></div>
+      <div class="flow-row"><span class="flow-label">Total output</span><span class="flow-val" id="fPout">—</span></div>
+      <div class="flow-divider"></div>
+      <div class="flow-balance" id="fPbalCard">
+        <span class="flow-balance-label">Balance</span>
+        <span class="flow-balance-val" id="fPbal">—</span>
+      </div>
     </div>
-
-    <!-- N Block -->
-    <div class="result-block" id="nBlock">
-      <div class="block-header">
-        <span class="block-title">Nitrogen balance</span>
-        <span class="block-element">N · atomic mass 14.007</span>
+    <div class="flow-nutrient">
+      <div class="flow-nutrient-name">Potassium</div>
+      <div class="flow-row"><span class="flow-label">Total input</span><span class="flow-val" id="fKin">—</span></div>
+      <div class="flow-row"><span class="flow-label">Total output</span><span class="flow-val" id="fKout">—</span></div>
+      <div class="flow-divider"></div>
+      <div class="flow-balance" id="fKbalCard">
+        <span class="flow-balance-label">Balance</span>
+        <span class="flow-balance-val" id="fKbal">—</span>
       </div>
-      <div class="balance-summary">
-        <div class="summary-card" id="nInputCard"><div class="s-label">Total Input</div><div class="s-value" id="nInputVal">—</div></div>
-        <div class="summary-card" id="nOutputCard"><div class="s-label">Total Output</div><div class="s-value" id="nOutputVal">—</div></div>
-        <div class="summary-card" id="nBalanceCard"><div class="s-label">Balance</div><div class="s-value" id="nBalanceVal">—</div></div>
-      </div>
-      <table class="breakdown-table">
-        <thead><tr><th>Component</th><th>Description</th><th>kg ha⁻¹</th></tr></thead>
-        <tbody>
-          <tr><td><strong>Inputs</strong></td><td style="color:var(--neutral-400);font-size:12px">Applied fertilizer + organic sources</td><td id="nTotalIn">—</td></tr>
-          <tr><td><strong>Outputs</strong></td><td></td><td></td></tr>
-          <tr class="row-indent"><td>  Crop uptake</td><td style="color:var(--neutral-400);font-size:12px">Grain + straw/haulm removal</td><td id="nUptake">—</td></tr>
-          <tr class="row-indent"><td>  Leaching</td><td style="color:var(--neutral-400);font-size:12px">Regression: texture × N rate</td><td id="nLeach">—</td></tr>
-          <tr class="row-indent"><td>  Volatilization</td><td style="color:var(--neutral-400);font-size:12px">NH₃ loss: pH, organic C, rainfall</td><td id="nVolat">—</td></tr>
-          <tr class="row-indent"><td>  N₂O emission</td><td style="color:var(--neutral-400);font-size:12px">GHG pathway: soil N × application</td><td id="nN2o">—</td></tr>
-          <tr class="total-row"><td colspan="2">Total output</td><td id="nTotalOut">—</td></tr>
-          <tr class="balance-row" id="nBalRow"><td colspan="2"><strong>Balance</strong></td><td id="nBal">—</td></tr>
-        </tbody>
-      </table>
     </div>
-
-    <!-- P Block -->
-    <div class="result-block" id="pBlock">
-      <div class="block-header">
-        <span class="block-title">Phosphorus balance</span>
-        <span class="block-element">P · atomic mass 30.974</span>
+    <div class="flow-nutrient" style="border-right:none">
+      <div class="flow-nutrient-name">Sulfur</div>
+      <div class="flow-row"><span class="flow-label">Total input</span><span class="flow-val" id="fSin">—</span></div>
+      <div class="flow-row"><span class="flow-label">Total output</span><span class="flow-val" id="fSout">—</span></div>
+      <div class="flow-divider"></div>
+      <div class="flow-balance" id="fSbalCard">
+        <span class="flow-balance-label">Balance</span>
+        <span class="flow-balance-val" id="fSbal">—</span>
       </div>
-      <div class="balance-summary">
-        <div class="summary-card"><div class="s-label">Total Input</div><div class="s-value" id="pInputVal">—</div></div>
-        <div class="summary-card"><div class="s-label">Total Output</div><div class="s-value" id="pOutputVal">—</div></div>
-        <div class="summary-card" id="pBalanceCard"><div class="s-label">Balance</div><div class="s-value" id="pBalanceVal">—</div></div>
-      </div>
-      <table class="breakdown-table">
-        <thead><tr><th>Component</th><th>Description</th><th>kg ha⁻¹</th></tr></thead>
-        <tbody>
-          <tr><td><strong>Inputs</strong></td><td style="color:var(--neutral-400);font-size:12px">Applied fertilizer + organic sources</td><td id="pTotalIn">—</td></tr>
-          <tr><td><strong>Outputs</strong></td><td></td><td></td></tr>
-          <tr class="row-indent"><td>  Crop uptake</td><td style="color:var(--neutral-400);font-size:12px">Grain + straw/haulm removal</td><td id="pUptake">—</td></tr>
-          <tr class="row-indent"><td>  Leaching</td><td style="color:var(--neutral-400);font-size:12px">Regression: texture × P rate</td><td id="pLeach">—</td></tr>
-          <tr class="total-row"><td colspan="2">Total output</td><td id="pTotalOut">—</td></tr>
-          <tr class="balance-row" id="pBalRow"><td colspan="2"><strong>Balance</strong></td><td id="pBal">—</td></tr>
-        </tbody>
-      </table>
     </div>
+  </div>
+</div>
 
-    <!-- K Block -->
-    <div class="result-block" id="kBlock">
-      <div class="block-header">
-        <span class="block-title">Potassium balance</span>
-        <span class="block-element">K · atomic mass 39.098</span>
-      </div>
-      <div class="balance-summary">
-        <div class="summary-card"><div class="s-label">Total Input</div><div class="s-value" id="kInputVal">—</div></div>
-        <div class="summary-card"><div class="s-label">Total Output</div><div class="s-value" id="kOutputVal">—</div></div>
-        <div class="summary-card" id="kBalanceCard"><div class="s-label">Balance</div><div class="s-value" id="kBalanceVal">—</div></div>
-      </div>
-      <table class="breakdown-table">
-        <thead><tr><th>Component</th><th>Description</th><th>kg ha⁻¹</th></tr></thead>
-        <tbody>
-          <tr><td><strong>Inputs</strong></td><td style="color:var(--neutral-400);font-size:12px">Applied fertilizer + organic sources</td><td id="kTotalIn">—</td></tr>
-          <tr><td><strong>Outputs</strong></td><td></td><td></td></tr>
-          <tr class="row-indent"><td>  Crop uptake</td><td style="color:var(--neutral-400);font-size:12px">Grain + straw/haulm removal</td><td id="kUptake">—</td></tr>
-          <tr class="row-indent"><td>  Leaching</td><td style="color:var(--neutral-400);font-size:12px">Regression: texture × K rate</td><td id="kLeach">—</td></tr>
-          <tr class="total-row"><td colspan="2">Total output</td><td id="kTotalOut">—</td></tr>
-          <tr class="balance-row" id="kBalRow"><td colspan="2"><strong>Balance</strong></td><td id="kBal">—</td></tr>
-        </tbody>
-      </table>
-    </div>
+<!-- Horizontal 4-nutrient breakdown -->
+<div class="nutrient-section" id="nutrientSection">
+  <div class="ns-header">
+    <div class="ns-header-title">Detailed nutrient breakdown</div>
+    <div class="ns-header-sub">All pathways · kg ha⁻¹</div>
+  </div>
+  <div class="nutrient-cols">
 
-    <!-- S Block -->
-    <div class="result-block" id="sBlock">
-      <div class="block-header">
-        <span class="block-title">Sulfur balance</span>
-        <span class="block-element">S · atomic mass 32.06</span>
-      </div>
-      <div class="balance-summary">
-        <div class="summary-card"><div class="s-label">Total Input</div><div class="s-value" id="sInputVal">—</div></div>
-        <div class="summary-card"><div class="s-label">Total Output</div><div class="s-value" id="sOutputVal">—</div></div>
-        <div class="summary-card" id="sBalanceCard"><div class="s-label">Balance</div><div class="s-value" id="sBalanceVal">—</div></div>
-      </div>
-      <table class="breakdown-table">
-        <thead><tr><th>Component</th><th>Description</th><th>kg ha⁻¹</th></tr></thead>
-        <tbody>
-          <tr><td><strong>Inputs</strong></td><td style="color:var(--neutral-400);font-size:12px">Applied fertilizer + organic sources</td><td id="sTotalIn">—</td></tr>
-          <tr><td><strong>Outputs</strong></td><td></td><td></td></tr>
-          <tr class="row-indent"><td>  Crop uptake</td><td style="color:var(--neutral-400);font-size:12px">Grain + straw/haulm removal</td><td id="sUptake">—</td></tr>
-          <tr class="row-indent"><td>  Leaching</td><td style="color:var(--neutral-400);font-size:12px">Regression: texture × S rate</td><td id="sLeach">—</td></tr>
-          <tr class="total-row"><td colspan="2">Total output</td><td id="sTotalOut">—</td></tr>
-          <tr class="balance-row" id="sBalRow"><td colspan="2"><strong>Balance</strong></td><td id="sBal">—</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Recommendations -->
-    <div class="rec-block" id="recBlock">
-      <div class="rec-header">
-        <h3>Adjusted fertilizer recommendation — zero balance target</h3>
-        <p>Dose required to achieve neutral nutrient balance under current field conditions</p>
-      </div>
-      <div class="rec-grid">
-        <div class="rec-cell"><div class="rc-label">N</div><div class="rc-val" id="recN">—</div><div style="font-size:11px;color:var(--neutral-400);margin-top:2px">kg ha⁻¹</div></div>
-        <div class="rec-cell"><div class="rc-label">P</div><div class="rc-val" id="recP">—</div><div style="font-size:11px;color:var(--neutral-400);margin-top:2px">kg ha⁻¹</div></div>
-        <div class="rec-cell"><div class="rc-label">K</div><div class="rc-val" id="recK">—</div><div style="font-size:11px;color:var(--neutral-400);margin-top:2px">kg ha⁻¹</div></div>
-        <div class="rec-cell"><div class="rc-label">S</div><div class="rc-val" id="recS">—</div><div style="font-size:11px;color:var(--neutral-400);margin-top:2px">kg ha⁻¹</div></div>
-      </div>
-
-      <div style="border-top:1px solid var(--neutral-100); padding:0.75rem 1.5rem; background:var(--neutral-50);">
-        <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--neutral-400);margin-bottom:0.75rem;">Previous standard recommendation</div>
-        <div class="rec-grid" style="border:none;background:none;">
-          <div class="rec-cell" style="background:none;border:none;padding:0.25rem 0"><div class="rc-label">N</div><div class="rc-val" id="prevN" style="font-size:1rem">—</div></div>
-          <div class="rec-cell" style="background:none;border:none;padding:0.25rem 0"><div class="rc-label">P</div><div class="rc-val" id="prevP" style="font-size:1rem">—</div></div>
-          <div class="rec-cell" style="background:none;border:none;padding:0.25rem 0"><div class="rc-label">K</div><div class="rc-val" id="prevK" style="font-size:1rem">—</div></div>
-          <div class="rec-cell" style="background:none;border:none;padding:0.25rem 0"><div class="rc-label">S</div><div class="rc-val" id="prevS" style="font-size:1rem">—</div></div>
-        </div>
-      </div>
-
-      <div style="border-top:1px solid var(--neutral-100); padding:0.75rem 1.5rem;">
-        <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--neutral-400);margin-bottom:0.75rem;">Readjustment (new minus previous)</div>
-        <div class="rec-grid" style="border:none;background:none;">
-          <div class="rec-cell" style="background:none;border:none;padding:0.25rem 0"><div class="rc-label">N</div><div class="rc-val" id="adjN" style="font-size:1rem">—</div></div>
-          <div class="rec-cell" style="background:none;border:none;padding:0.25rem 0"><div class="rc-label">P</div><div class="rc-val" id="adjP" style="font-size:1rem">—</div></div>
-          <div class="rec-cell" style="background:none;border:none;padding:0.25rem 0"><div class="rc-label">K</div><div class="rc-val" id="adjK" style="font-size:1rem">—</div></div>
-          <div class="rec-cell" style="background:none;border:none;padding:0.25rem 0"><div class="rc-label">S</div><div class="rc-val" id="adjS" style="font-size:1rem">—</div></div>
-        </div>
+    <!-- Nitrogen -->
+    <div class="nutrient-col">
+      <div class="nc-name">Nitrogen</div>
+      <div class="nc-row"><span class="nc-label">Applied + organic input</span><span class="nc-val" id="nc-nIn">—</span></div>
+      <div class="nc-divider"></div>
+      <div class="nc-row"><span class="nc-label">Crop uptake</span><span class="nc-val" id="nc-nUp">—</span></div>
+      <div class="nc-row"><span class="nc-label">Leaching</span><span class="nc-val" id="nc-nLe">—</span></div>
+      <div class="nc-row"><span class="nc-label">Volatilization (NH₃)</span><span class="nc-val" id="nc-nVo">—</span></div>
+      <div class="nc-row"><span class="nc-label">N₂O emission</span><span class="nc-val" id="nc-nN2">—</span></div>
+      <div class="nc-divider"></div>
+      <div class="nc-total-row"><span class="nc-total-label">Total output</span><span class="nc-total-val" id="nc-nOut">—</span></div>
+      <div class="nc-balance" id="nc-nBal">
+        <span class="nc-bal-label">Balance</span>
+        <span class="nc-bal-val" id="nc-nBalV">—</span>
       </div>
     </div>
 
-    <div style="font-size:11.5px;color:var(--neutral-400);line-height:1.7;padding:0.25rem 0;font-family:var(--mono);">
-      Model basis: nutrient balance = total inputs − (crop uptake + leaching + gaseous losses). Positive balance indicates surplus; negative indicates soil depletion. Regression coefficients derived from field experiments across three agroecological zones (AEZs 28, 30, 7). Organic amendment nutrient content: cow dung N=5, P=1.5, K=2.3, S=0.8 kg t⁻¹; farmyard N=3, P=0.7, K=2.5, S=0.26 kg t⁻¹; poultry N=6, P=3.5, K=4.8, S=1.1 kg t⁻¹.
+    <!-- Phosphorus -->
+    <div class="nutrient-col">
+      <div class="nc-name">Phosphorus</div>
+      <div class="nc-row"><span class="nc-label">Applied + organic input</span><span class="nc-val" id="nc-pIn">—</span></div>
+      <div class="nc-divider"></div>
+      <div class="nc-row"><span class="nc-label">Crop uptake</span><span class="nc-val" id="nc-pUp">—</span></div>
+      <div class="nc-row"><span class="nc-label">Leaching</span><span class="nc-val" id="nc-pLe">—</span></div>
+      <div class="nc-divider"></div>
+      <div class="nc-total-row"><span class="nc-total-label">Total output</span><span class="nc-total-val" id="nc-pOut">—</span></div>
+      <div class="nc-balance" id="nc-pBal">
+        <span class="nc-bal-label">Balance</span>
+        <span class="nc-bal-val" id="nc-pBalV">—</span>
+      </div>
     </div>
+
+    <!-- Potassium -->
+    <div class="nutrient-col">
+      <div class="nc-name">Potassium</div>
+      <div class="nc-row"><span class="nc-label">Applied + organic input</span><span class="nc-val" id="nc-kIn">—</span></div>
+      <div class="nc-divider"></div>
+      <div class="nc-row"><span class="nc-label">Crop uptake</span><span class="nc-val" id="nc-kUp">—</span></div>
+      <div class="nc-row"><span class="nc-label">Leaching</span><span class="nc-val" id="nc-kLe">—</span></div>
+      <div class="nc-divider"></div>
+      <div class="nc-total-row"><span class="nc-total-label">Total output</span><span class="nc-total-val" id="nc-kOut">—</span></div>
+      <div class="nc-balance" id="nc-kBal">
+        <span class="nc-bal-label">Balance</span>
+        <span class="nc-bal-val" id="nc-kBalV">—</span>
+      </div>
+    </div>
+
+    <!-- Sulfur -->
+    <div class="nutrient-col">
+      <div class="nc-name">Sulfur</div>
+      <div class="nc-row"><span class="nc-label">Applied + organic input</span><span class="nc-val" id="nc-sIn">—</span></div>
+      <div class="nc-divider"></div>
+      <div class="nc-row"><span class="nc-label">Crop uptake</span><span class="nc-val" id="nc-sUp">—</span></div>
+      <div class="nc-row"><span class="nc-label">Leaching</span><span class="nc-val" id="nc-sLe">—</span></div>
+      <div class="nc-divider"></div>
+      <div class="nc-total-row"><span class="nc-total-label">Total output</span><span class="nc-total-val" id="nc-sOut">—</span></div>
+      <div class="nc-balance" id="nc-sBal">
+        <span class="nc-bal-label">Balance</span>
+        <span class="nc-bal-val" id="nc-sBalV">—</span>
+      </div>
+    </div>
+
+  </div>
+  <div class="ns-unit-note">All values in kg ha⁻¹ · Positive balance = surplus · Negative balance = soil depletion</div>
+</div>
+
+<!-- Recommendations -->
+<div class="rec-block" id="recBlock">
+  <div class="rec-header">
+    <h3>Adjusted fertilizer recommendation — zero balance target</h3>
+    <p>Dose required to achieve neutral nutrient balance under current field conditions</p>
+  </div>
+  <div class="rec-grid">
+    <div class="rec-cell"><div class="rc-label">Nitrogen</div><div class="rc-val" id="recN">—</div><div style="font-size:11px;color:var(--neutral-400);margin-top:2px">kg ha⁻¹</div></div>
+    <div class="rec-cell"><div class="rc-label">Phosphorus</div><div class="rc-val" id="recP">—</div><div style="font-size:11px;color:var(--neutral-400);margin-top:2px">kg ha⁻¹</div></div>
+    <div class="rec-cell"><div class="rc-label">Potassium</div><div class="rc-val" id="recK">—</div><div style="font-size:11px;color:var(--neutral-400);margin-top:2px">kg ha⁻¹</div></div>
+    <div class="rec-cell"><div class="rc-label">Sulfur</div><div class="rc-val" id="recS">—</div><div style="font-size:11px;color:var(--neutral-400);margin-top:2px">kg ha⁻¹</div></div>
+  </div>
+  <div class="rec-sub-label">Previous standard recommendation (kg ha⁻¹)</div>
+  <div class="rec-grid" style="padding: 0 0 0.75rem;">
+    <div class="rec-cell" style="border-bottom:none"><div class="rc-label">Nitrogen</div><div class="rc-val" id="prevN" style="font-size:1rem">—</div></div>
+    <div class="rec-cell" style="border-bottom:none"><div class="rc-label">Phosphorus</div><div class="rc-val" id="prevP" style="font-size:1rem">—</div></div>
+    <div class="rec-cell" style="border-bottom:none"><div class="rc-label">Potassium</div><div class="rc-val" id="prevK" style="font-size:1rem">—</div></div>
+    <div class="rec-cell" style="border-bottom:none"><div class="rc-label">Sulfur</div><div class="rc-val" id="prevS" style="font-size:1rem">—</div></div>
+  </div>
+  <div class="rec-sub-label" style="border-top:1px solid var(--neutral-100)">Readjustment — new minus previous (kg ha⁻¹)</div>
+  <div class="rec-grid" style="padding: 0 0 0.75rem;">
+    <div class="rec-cell" style="border-bottom:none"><div class="rc-label">Nitrogen</div><div class="rc-val" id="adjN" style="font-size:1rem">—</div></div>
+    <div class="rec-cell" style="border-bottom:none"><div class="rc-label">Phosphorus</div><div class="rc-val" id="adjP" style="font-size:1rem">—</div></div>
+    <div class="rec-cell" style="border-bottom:none"><div class="rc-label">Potassium</div><div class="rc-val" id="adjK" style="font-size:1rem">—</div></div>
+    <div class="rec-cell" style="border-bottom:none"><div class="rc-label">Sulfur</div><div class="rc-val" id="adjS" style="font-size:1rem">—</div></div>
+  </div>
+</div>
+
+<!-- Methodology note -->
+<div class="method-block">
+  <div class="method-header" onclick="toggleMethod()">
+    <span class="method-header-title">Model methodology &amp; scientific basis</span>
+    <span class="method-toggle" id="methodToggle">+</span>
+  </div>
+  <div class="method-body" id="methodBody">
+    <p><strong>Nutrient balance framework.</strong> The model estimates the difference between total nutrient inputs and total nutrient outputs for each element (nitrogen, phosphorus, potassium, sulfur). A positive balance indicates a net surplus remaining in the soil; a negative balance indicates soil depletion requiring corrective fertilization.</p>
+    <p><strong>Leaching losses.</strong> Leaching is estimated using element-specific multiple regression equations incorporating the applied nutrient rate, soil sand fraction, silt fraction, and clay fraction. A regression-based approach was chosen over fixed-fraction methods because leaching is strongly texture-dependent — sandy soils lose substantially more nitrogen and potassium than clay-rich soils under the same rainfall regime.</p>
+    <p><strong>Nitrogen gaseous losses.</strong> Volatilization (NH₃) and nitrous oxide (N₂O) are modeled separately, each via its own regression equation. Volatilization coefficients include applied nitrogen rate, soil organic carbon, pH, mineral nitrogen, and seasonal rainfall. N₂O coefficients additionally incorporate soil nitrate (NO₃⁻). These two pathways are kept separate because they have distinct drivers: volatilization is dominated by pH and organic matter interactions, while N₂O production is driven by denitrification activity linked to nitrate availability.</p>
+    <p><strong>Organic amendments.</strong> Cow dung, farmyard manure, and poultry manure each contribute fixed quantities of nitrogen, phosphorus, potassium, and sulfur per tonne, derived from average nutrient content measurements from Bangladesh field experiments. Crop residue retention contributes additional nutrients per inch of standing stubble, with crop-specific coefficients.</p>
+    <p><strong>Zero-balance recommendation.</strong> The adjusted dose required to achieve a neutral balance is back-calculated from the balance equation, corrected by a nutrient use efficiency factor that accounts for fertilizer losses during uptake. This factor varies by crop and nutrient, reflecting differences in crop recovery efficiency across systems.</p>
+    <p><strong>Validation.</strong> The model coefficients were derived from and validated against field experimental data collected across three agroecological zones of Bangladesh: AEZ 28 (Bogura), AEZ 30 (Cumilla), and AEZ 7 (Mymensingh), covering a range of soil textures, rainfall regimes, and agronomic management practices.</p>
+  </div>
+</div>
+```
 
   </section>
 </main>
 
+<!-- ── AUTHOR SECTION ── -->
+
+<div style="max-width:1280px; margin: 2rem auto; padding: 0 2.5rem;">
+  <div class="author-section">
+    <div class="author-inner">
+      <div class="author-sidebar">
+        <div class="author-avatar">MK</div>
+        <div class="author-role">Soil Scientist<br>Equation Developer</div>
+        <div class="author-links">
+          <a class="author-link" href="https://kamruzzaman17.github.io/kamruzzaman/" target="_blank">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+            Portfolio
+          </a>
+          <a class="author-link" href="https://scholar.google.com/citations?user=rb326vAAAAAJ" target="_blank">
+            <svg viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18V17c0 1.1 3.13 3 7 3s7-1.9 7-3v-5.82L20 9l-8-6zm0 12.5c-2.33 0-4-.67-4-1s1.67-1 4-1 4 .67 4 1-1.67 1-4 1z"/></svg>
+            Google Scholar
+          </a>
+          <a class="author-link" href="https://www.researchgate.net/profile/Md-Kamruzzaman-82" target="_blank">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+            ResearchGate
+          </a>
+          <a class="author-link" href="https://www.linkedin.com/in/md-kamruzzaman-65603a184" target="_blank">
+            <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            LinkedIn
+          </a>
+          <a class="author-link" href="mailto:kamruzzaman.swe@gmail.com">
+            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            Email
+          </a>
+        </div>
+      </div>
+      <div class="author-main">
+        <div class="author-name">Md Kamruzzaman</div>
+        <div class="author-affil">Department of Soil Science · Bangladesh Agricultural University (BAU) · Mymensingh, Bangladesh</div>
+        <p class="author-bio">
+          Md Kamruzzaman is a soil scientist with research interests in soil organic carbon dynamics, nitrogen cycling, nutrient biogeochemistry, and heavy metal ecotoxicology in agricultural systems. He holds an MSc in Soil Science from Bangladesh Agricultural University and is currently completing a second MSc in Ecotoxicology at the Hungarian University of Agriculture and Life Sciences (MATE), Gödöllő, Hungary, supported by the Stipendium Hungaricum Scholarship. His research spans field-scale nutrient balance modelling, greenhouse gas emissions (N₂O, CO₂) from agricultural soils, and enzyme biomarker responses to environmental contaminants.
+        </p>
+        <div class="author-attribution">
+          <strong>Methodology statement:</strong> The nutrient balance equations, crop-specific regression coefficients for leaching and gaseous losses, organic amendment nutrient content constants, moisture correction factors, and agronomic efficiency parameters incorporated in this calculator were independently developed by Md Kamruzzaman, based on field experimental data collected across three agroecological zones of Bangladesh (Bogura, Cumilla, Mymensingh). This open-source web implementation is the author's own version of that work, published here to make the methodology freely accessible to researchers and practitioners.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── CITATION BLOCK ── -->
+
+<div style="max-width:1280px; margin: 0 auto 1rem; padding: 0 2.5rem;">
+  <div class="cite-block">
+    <div class="cite-header"><div class="cite-header-title">How to cite this tool</div></div>
+    <div class="cite-body">
+      <div class="cite-text">Kamruzzaman, Md. (2024). Soil Nutrient Balance Calculator for Major Bangladesh Cropping Systems [Web application]. Department of Soil Science, Bangladesh Agricultural University. Available at: https://kamruzzaman17.github.io/kamruzzaman/</div>
+      <p class="cite-note">If you use the nutrient balance methodology or regression coefficients in your research, please cite the original developer. For academic collaboration or correspondence, contact kamruzzaman.swe@gmail.com.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+
 <footer class="site-footer">
-  <span>Nutrient Balance Calculator v2.6 · ESP-Biogeochem Lab · BSMRAU</span>
-  <span>Equations: Md Kamruzzaman · Code: ESP-Biogeochem Lab</span>
+  <span>Soil Nutrient Balance Calculator v2.0 · Department of Soil Science, BAU · 2024</span>
+  <span>Equations &amp; methodology: Md Kamruzzaman · Open-source implementation</span>
 </footer>
 
 <script>
@@ -774,12 +1014,11 @@ const CROPS = {
     prevDose:   { N:135, P:40, K:90, S:10 },
     effFactor:  { N:0.9, P:1.0, K:0.7, S:1.1 },
     defaultInputs: { grainYield:20, strawYield:10, nRate:140, pRate:40, kRate:90, sRate:10, rainfall:250, cowDung:5 },
-    uptakeBase: { N:[0,0], P:[0,0], K:[0,0], S:[0,0] },
     leachCoef: {
       N: { rate:0.00469, sand:0.056, silt:0.036, clay:-0.056, intercept:-1.01 },
-      P: { rate:0.0209,  sand:0.056, silt:0.036, clay:-0.056, intercept:3.0   },
-      K: { rate:0.00997, sand:0.056, silt:0.036, clay:-0.056, intercept:3.0   },
-      S: { rate:0.0425,  sand:0.056, silt:0.036, clay:-0.056, intercept:0.1   }
+      P: { rate:0.0209,  sand:0.056, silt:0.036, clay:-0.056, intercept:3.0  },
+      K: { rate:0.00997, sand:0.056, silt:0.036, clay:-0.056, intercept:3.0  },
+      S: { rate:0.0425,  sand:0.056, silt:0.036, clay:-0.056, intercept:0.1  }
     },
     volatCoef: { intercept:0, nRate:0.04695, organicC:0.14554, pH:0.01, mineralN:0.02, rainfall:0.000621 },
     n2oCoef:   { intercept:3.4901, nRate:0.07043, no3:0.05200, organicC:0.1455, pH:0.03, rainfall:0.000621 },
@@ -802,9 +1041,9 @@ const CROPS = {
     defaultInputs: { grainYield:6, strawYield:6.5, nRate:150, pRate:16, kRate:77, sRate:12, rainfall:553, cowDung:3 },
     leachCoef: {
       N: { rate:0.00464, sand:0.056, silt:0.036, clay:-0.056, intercept:5.123 },
-      P: { rate:0.0209,  sand:0.056, silt:0.036, clay:-0.056, intercept:1.0   },
-      K: { rate:0.00997, sand:0.056, silt:0.036, clay:-0.056, intercept:1.03  },
-      S: { rate:0.0425,  sand:0.056, silt:0.036, clay:-0.056, intercept:0.1   }
+      P: { rate:0.0209,  sand:0.056, silt:0.036, clay:-0.056, intercept:1.0  },
+      K: { rate:0.00997, sand:0.056, silt:0.036, clay:-0.056, intercept:1.03 },
+      S: { rate:0.0425,  sand:0.056, silt:0.036, clay:-0.056, intercept:0.1  }
     },
     volatCoef: { intercept:-5.123, nRate:0.15643, organicC:0.09633, pH:0.01, mineralN:0.05, rainfall:0.000621 },
     n2oCoef:   { intercept:6.3005, nRate:0.03770, no3:0.05665, organicC:0.09633, pH:0.13, rainfall:0.000621 },
@@ -818,7 +1057,7 @@ const CROPS = {
   },
   aus: {
     name: 'T. Aus Rice', scientific: 'Oryza sativa (pre-monsoon)',
-    season: 'Pre-monsoon transplanted', period: 'March – July',
+    season: 'Pre-monsoon transplanted rice', period: 'March – July',
     moistureGrain: 0.86, moistureStraw: 0.86,
     grainConc: { N:1.06, P:0.28, K:0.31, S:0.12 },
     strawConc:  { N:1.04, P:0.17, K:1.38, S:0.15 },
@@ -826,24 +1065,24 @@ const CROPS = {
     effFactor:  { N:0.6, P:1.0, K:0.9, S:1.0 },
     defaultInputs: { grainYield:4.5, strawYield:5.5, nRate:70, pRate:8, kRate:40, sRate:6, rainfall:1254, cowDung:0 },
     leachCoef: {
-      N: { rate:0.0097, sand:0.056, silt:0.036, clay:-0.056, intercept:4.65  },
-      P: { rate:0.043,  sand:0.056, silt:0.036, clay:-0.056, intercept:0.02  },
-      K: { rate:0.013,  sand:0.056, silt:0.036, clay:-0.056, intercept:0.1   },
-      S: { rate:0.083,  sand:0.056, silt:0.036, clay:-0.056, intercept:0.1   }
+      N: { rate:0.0097, sand:0.056, silt:0.036, clay:-0.056, intercept:4.65 },
+      P: { rate:0.043,  sand:0.056, silt:0.036, clay:-0.056, intercept:0.02 },
+      K: { rate:0.013,  sand:0.056, silt:0.036, clay:-0.056, intercept:0.1  },
+      S: { rate:0.083,  sand:0.056, silt:0.036, clay:-0.056, intercept:0.1  }
     },
     volatCoef: { intercept:-0.4129, nRate:0.24343, organicC:0.09633, pH:0.01, mineralN:0.05, rainfall:0.000621 },
     n2oCoef:   { intercept:2.5, nRate:0.07681, no3:0.05665, organicC:0.09633, pH:0.13, rainfall:0.000621 },
     totalInputCoef: {
-      N: { rate:1.01, rainfall:0.000621 },
-      P: { rate:1.015, rainfall:0.00347 },
-      K: { rate:1.01145, rainfall:0.00682 },
-      S: { rate:1.072, rainfall:0.00028 }
+      N: { rate:1.01,   rainfall:0.000621 },
+      P: { rate:1.015,  rainfall:0.00347 },
+      K: { rate:1.01145,rainfall:0.00682 },
+      S: { rate:1.072,  rainfall:0.00028 }
     },
     residueCoef: { N:1.5, P:0.3125, K:1.0, S:0.25 }
   },
   aman: {
     name: 'T. Aman Rice', scientific: 'Oryza sativa (monsoon)',
-    season: 'Kharif monsoon transplanted', period: 'June – December',
+    season: 'Kharif monsoon transplanted rice', period: 'June – December',
     moistureGrain: 0.86, moistureStraw: 0.86,
     grainConc: { N:1.14, P:0.30, K:0.37, S:0.12 },
     strawConc:  { N:1.11, P:0.14, K:1.25, S:0.15 },
@@ -851,10 +1090,10 @@ const CROPS = {
     effFactor:  { N:0.7, P:1.0, K:1.0, S:1.0 },
     defaultInputs: { grainYield:4.5, strawYield:5, nRate:90, pRate:7, kRate:50, sRate:4, rainfall:888, cowDung:0 },
     leachCoef: {
-      N: { rate:0.0049, sand:0.056, silt:0.036, clay:-0.056, intercept:5.0   },
-      P: { rate:0.0209, sand:0.056, silt:0.036, clay:-0.056, intercept:0.5   },
-      K: { rate:0.013,  sand:0.056, silt:0.036, clay:-0.056, intercept:1.0   },
-      S: { rate:0.083,  sand:0.056, silt:0.036, clay:-0.056, intercept:0.01  }
+      N: { rate:0.0049, sand:0.056, silt:0.036, clay:-0.056, intercept:5.0  },
+      P: { rate:0.0209, sand:0.056, silt:0.036, clay:-0.056, intercept:0.5  },
+      K: { rate:0.013,  sand:0.056, silt:0.036, clay:-0.056, intercept:1.0  },
+      S: { rate:0.083,  sand:0.056, silt:0.036, clay:-0.056, intercept:0.01 }
     },
     volatCoef: { intercept:-1.2039, nRate:0.29091, organicC:0.09633, pH:0.01, mineralN:0.05, rainfall:0.000621 },
     n2oCoef:   { intercept:4.9959, nRate:0.06368, no3:0.05665, organicC:0.09633, pH:0.13, rainfall:0.000621 },
@@ -876,10 +1115,10 @@ const CROPS = {
     effFactor:  { N:0.7, P:1.0, K:1.0, S:1.0 },
     defaultInputs: { grainYield:9, strawYield:5, nRate:225, pRate:60, kRate:80, sRate:30, rainfall:226, cowDung:0 },
     leachCoef: {
-      N: { rate:0.0209, sand:0.056, silt:0.036, clay:-0.056, intercept:3.0   },
-      P: { rate:0.00997,sand:0.056, silt:0.036, clay:-0.056, intercept:1.5   },
-      K: { rate:0.0425, sand:0.056, silt:0.036, clay:-0.056, intercept:-2.0  },
-      S: { rate:0.083,  sand:0.056, silt:0.036, clay:-0.056, intercept:2.0   }
+      N: { rate:0.0209,  sand:0.056, silt:0.036, clay:-0.056, intercept:3.0  },
+      P: { rate:0.00997, sand:0.056, silt:0.036, clay:-0.056, intercept:1.5  },
+      K: { rate:0.0425,  sand:0.056, silt:0.036, clay:-0.056, intercept:-2.0 },
+      S: { rate:0.083,   sand:0.056, silt:0.036, clay:-0.056, intercept:2.0  }
     },
     volatCoef: { intercept:-1.7934, nRate:0.33778, organicC:0.09633, pH:0.01, mineralN:0.05, rainfall:0.000621 },
     n2oCoef:   { intercept:0.2104, nRate:0.06157, no3:0.05665, organicC:0.09633, pH:0.13, rainfall:0.000621 },
@@ -894,154 +1133,131 @@ const CROPS = {
 };
 
 const ORGANIC = {
-  cowDung:  { N:5,   P:1.5, K:2.3, S:0.8  },
-  farmyard: { N:3,   P:0.7, K:2.5, S:0.9  },
-  poultry:  { N:6,   P:3.5, K:4.8, S:1.1  }
+  cowDung:  { N:5,  P:1.5, K:2.3, S:0.8 },
+  farmyard: { N:3,  P:0.7, K:2.5, S:0.9 },
+  poultry:  { N:6,  P:3.5, K:4.8, S:1.1 }
 };
 
-const VOLATPER_INCH   = { volaT:0.25, n2o:0.025 };
-const VOLATPER_TON    = { volaT:0.4,  n2o:0.4   };
+const VOLATPER_TON  = { volaT:0.4,  n2o:0.4  };
+const VOLATPER_INCH = { volaT:0.25, n2o:0.025 };
 
 let currentCrop = 'potato';
 
 function selectCrop(crop, btn) {
   currentCrop = crop;
   document.querySelectorAll('.crop-tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
-  btn.classList.add('active');
-  btn.setAttribute('aria-selected','true');
+  btn.classList.add('active'); btn.setAttribute('aria-selected','true');
   const d = CROPS[crop].defaultInputs;
-  setVal('grainYield', d.grainYield);
-  setVal('strawYield', d.strawYield);
-  setVal('nRate', d.nRate);
-  setVal('pRate', d.pRate);
-  setVal('kRate', d.kRate);
-  setVal('sRate', d.sRate);
-  setVal('rainfall', d.rainfall);
-  setVal('cowDung', d.cowDung || 0);
+  setVal('grainYield', d.grainYield); setVal('strawYield', d.strawYield);
+  setVal('nRate', d.nRate); setVal('pRate', d.pRate);
+  setVal('kRate', d.kRate); setVal('sRate', d.sRate);
+  setVal('rainfall', d.rainfall); setVal('cowDung', d.cowDung || 0);
   hideResults();
 }
 
 function setVal(id, v) { document.getElementById(id).value = v; }
 function getVal(id) { return parseFloat(document.getElementById(id).value) || 0; }
-
 function updateClay() {
-  const sand = getVal('sand'), silt = getVal('silt');
-  document.getElementById('clay').value = Math.max(0, 100 - sand - silt).toFixed(1);
+  const s = getVal('sand'), si = getVal('silt');
+  document.getElementById('clay').value = Math.max(0, 100 - s - si).toFixed(1);
 }
-
 function fmt(v) { return v.toFixed(2); }
+function fmtSigned(v) { return (v >= 0 ? '+' : '') + fmt(v); }
 
 function hideResults() {
   document.getElementById('placeholder').style.display = 'block';
-  ['nBlock','pBlock','kBlock','sBlock','recBlock'].forEach(id => {
-    document.getElementById(id).classList.remove('visible');
-  });
+  ['balanceFlow','nutrientSection','recBlock'].forEach(id => document.getElementById(id).classList.remove('visible'));
   document.getElementById('cropInfoBar').classList.remove('visible');
+}
+
+function setFlow(inId, outId, balCardId, balId, inV, outV, balV) {
+  document.getElementById(inId).textContent = fmt(inV);
+  document.getElementById(outId).textContent = fmt(outV);
+  document.getElementById(balId).textContent = fmtSigned(balV);
+  const card = document.getElementById(balCardId);
+  card.classList.remove('pos','neg');
+  card.classList.add(balV >= 0 ? 'pos' : 'neg');
+}
+
+function setNutrientCol(prefix, inV, upV, leV, voV, n2V, outV, balV, hasGas) {
+  document.getElementById('nc-'+prefix+'In').textContent  = fmt(inV);
+  document.getElementById('nc-'+prefix+'Up').textContent  = fmt(upV);
+  document.getElementById('nc-'+prefix+'Le').textContent  = fmt(leV);
+  if (hasGas) {
+    document.getElementById('nc-'+prefix+'Vo').textContent = fmt(voV);
+    document.getElementById('nc-'+prefix+'N2').textContent = fmt(n2V);
+  }
+  document.getElementById('nc-'+prefix+'Out').textContent = fmt(outV);
+  document.getElementById('nc-'+prefix+'BalV').textContent = fmtSigned(balV);
+  const card = document.getElementById('nc-'+prefix+'Bal');
+  card.classList.remove('pos','neg');
+  card.classList.add(balV >= 0 ? 'pos' : 'neg');
+}
+
+function setAdj(id, v) {
+  const el = document.getElementById(id);
+  el.textContent = fmtSigned(v);
+  el.className = 'rc-val ' + (v >= 0 ? 'rc-adj-pos' : 'rc-adj-neg');
+  el.style.fontSize = '1rem';
+}
+
+function toggleMethod() {
+  const body = document.getElementById('methodBody');
+  const tog = document.getElementById('methodToggle');
+  body.classList.toggle('open');
+  tog.classList.toggle('open');
+  tog.textContent = body.classList.contains('open') ? '×' : '+';
 }
 
 function calculate() {
   const crop = CROPS[currentCrop];
-
-  // Inputs
   const sand = getVal('sand'), silt = getVal('silt'), clay = getVal('clay');
   const rainfall = getVal('rainfall'), ph = getVal('ph');
   const mineralN = getVal('mineralN'), no3 = getVal('no3');
-  const totalNpct = getVal('totalN'), organicC = getVal('organicC');
+  const organicC = getVal('organicC');
   const grainYield = getVal('grainYield'), strawYield = getVal('strawYield');
-  const nRate = getVal('nRate'), pRate = getVal('pRate');
-  const kRate = getVal('kRate'), sRate = getVal('sRate');
+  const nRate = getVal('nRate'), pRate = getVal('pRate'), kRate = getVal('kRate'), sRate = getVal('sRate');
   const cowDung = getVal('cowDung'), farmyard = getVal('farmyard'), poultry = getVal('poultry');
   const residue = getVal('residue');
-
   const mg = crop.moistureGrain, ms = crop.moistureStraw;
 
-  // ── UPTAKE ──
   function uptake(nu) {
-    const gc = crop.grainConc[nu], sc = crop.strawConc[nu];
-    return ((gc * grainYield * mg * 1000) / 100) + ((sc * strawYield * ms * 1000) / 100);
+    return ((crop.grainConc[nu] * grainYield * mg * 1000) / 100) + ((crop.strawConc[nu] * strawYield * ms * 1000) / 100);
   }
-
-  // ── LEACHING (regression: rate, sand, silt, clay, intercept) ──
   function leach(nu, rate) {
     const c = crop.leachCoef[nu];
     return Math.max(0, c.rate * rate + c.sand * sand + c.silt * silt + c.clay * clay + c.intercept);
   }
-
-  // ── VOLATILIZATION (N only) ──
-  const vc = crop.volatCoef;
-  const organicAmendTons = cowDung + farmyard + poultry;
-  const volatBase = vc.intercept + vc.nRate * nRate + vc.organicC * organicC + vc.pH * ph + vc.mineralN * mineralN + vc.rainfall * rainfall;
-  const volatAmend = organicAmendTons * VOLATPER_TON.volaT;
-  const volatResidue = residue * VOLATPER_INCH.volaT;
-  const volatTotal = Math.max(0, volatBase + volatAmend + volatResidue);
-
-  // ── N2O (N only) ──
-  const nc = crop.n2oCoef;
-  const n2oBase = nc.intercept + nc.nRate * nRate + nc.no3 * no3 + nc.organicC * organicC + nc.pH * ph + nc.rainfall * rainfall;
-  const n2oAmend = organicAmendTons * VOLATPER_TON.n2o;
-  const n2oResidue = residue * VOLATPER_INCH.n2o;
-  const n2oTotal = Math.max(0, n2oBase + n2oAmend + n2oResidue);
-
-  // ── ORGANIC AMENDMENT INPUTS ──
   function orgInput(nu) {
     return cowDung * ORGANIC.cowDung[nu] + farmyard * ORGANIC.farmyard[nu] + poultry * ORGANIC.poultry[nu];
   }
 
-  // ── RESIDUE INPUT ──
-  const residueInput = {
-    N: residue * crop.residueCoef.N,
-    P: residue * crop.residueCoef.P,
-    K: residue * crop.residueCoef.K,
-    S: residue * crop.residueCoef.S
-  };
+  const organicTons = cowDung + farmyard + poultry;
+  const vc = crop.volatCoef;
+  const volatTotal = Math.max(0, vc.intercept + vc.nRate*nRate + vc.organicC*organicC + vc.pH*ph + vc.mineralN*mineralN + vc.rainfall*rainfall + organicTons*VOLATPER_TON.volaT + residue*VOLATPER_INCH.volaT);
+  const nc = crop.n2oCoef;
+  const n2oTotal = Math.max(0, nc.intercept + nc.nRate*nRate + nc.no3*no3 + nc.organicC*organicC + nc.pH*ph + nc.rainfall*rainfall + organicTons*VOLATPER_TON.n2o + residue*VOLATPER_INCH.n2o);
 
-  // ── TOTAL INPUT (fertilizer × efficiency coef + rainfall contribution + organic + residue) ──
+  const residueInput = { N: residue*crop.residueCoef.N, P: residue*crop.residueCoef.P, K: residue*crop.residueCoef.K, S: residue*crop.residueCoef.S };
+
   function totalInput(nu, rate) {
     const tc = crop.totalInputCoef[nu];
-    return tc.rate * rate + tc.rainfall * rainfall + orgInput(nu) + residueInput[nu];
+    return tc.rate*rate + tc.rainfall*rainfall + orgInput(nu) + residueInput[nu];
   }
 
-  const nTotalIn = totalInput('N', nRate);
-  const pTotalIn = totalInput('P', pRate);
-  const kTotalIn = totalInput('K', kRate);
-  const sTotalIn = totalInput('S', sRate);
-
-  // ── UPTAKE values ──
+  const nIn = totalInput('N',nRate), pIn = totalInput('P',pRate), kIn = totalInput('K',kRate), sIn = totalInput('S',sRate);
   const nUp = uptake('N'), pUp = uptake('P'), kUp = uptake('K'), sUp = uptake('S');
+  const nLe = leach('N',nRate), pLe = leach('P',pRate), kLe = leach('K',kRate), sLe = leach('S',sRate);
+  const nOut = nUp+nLe+volatTotal+n2oTotal, pOut = pUp+pLe, kOut = kUp+kLe, sOut = sUp+sLe;
+  const nBal = nIn-nOut, pBal = pIn-pOut, kBal = kIn-kOut, sBal = sIn-sOut;
 
-  // ── LEACHING values ──
-  const nLe = leach('N', nRate), pLe = leach('P', pRate), kLe = leach('K', kRate), sLe = leach('S', sRate);
-
-  // ── TOTAL OUTPUT ──
-  const nTotalOut = nUp + nLe + volatTotal + n2oTotal;
-  const pTotalOut = pUp + pLe;
-  const kTotalOut = kUp + kLe;
-  const sTotalOut = sUp + sLe;
-
-  // ── BALANCE ──
-  const nBal = nTotalIn - nTotalOut;
-  const pBal = pTotalIn - pTotalOut;
-  const kBal = kTotalIn - kTotalOut;
-  const sBal = sTotalIn - sTotalOut;
-
-  // ── NEW RECOMMENDATION (zero balance) ──
   const ef = crop.effFactor;
-  const recNval = ((nBal / ef.N) * -1) + nRate;
-  const recPval = ((pBal / ef.P) * -1) + pRate;
-  const recKval = ((kBal / ef.K) * -1) + kRate;
-  const recSval = ((sBal / ef.S) * -1) + sRate;
-
-  // ── READJUSTMENT ──
+  const recNv = ((nBal/ef.N)*-1)+nRate, recPv = ((pBal/ef.P)*-1)+pRate;
+  const recKv = ((kBal/ef.K)*-1)+kRate, recSv = ((sBal/ef.S)*-1)+sRate;
   const prev = crop.prevDose;
-  const adjNv = recNval - prev.N;
-  const adjPv = recPval - prev.P;
-  const adjKv = recKval - prev.K;
-  const adjSv = recSval - prev.S;
 
-  // ── UPDATE DOM ──
   document.getElementById('placeholder').style.display = 'none';
 
-  // Crop info bar
   const bar = document.getElementById('cropInfoBar');
   bar.classList.add('visible');
   document.getElementById('cibName').textContent = crop.name + ' (' + crop.scientific + ')';
@@ -1049,81 +1265,33 @@ function calculate() {
   document.getElementById('cibPeriod').textContent = crop.period;
   document.getElementById('cibMoisture').textContent = `Grain ${(mg*100).toFixed(0)}% DM, Straw ${(ms*100).toFixed(0)}% DM`;
 
-  // N block
-  showBlock('nBlock');
-  setResult('nUptake', nUp); setResult('nLeach', nLe);
-  setResult('nVolat', volatTotal); setResult('nN2o', n2oTotal);
-  setResult('nTotalIn', nTotalIn); setResult('nTotalOut', nTotalOut);
-  setBalanceResult('nBal', 'nBalRow', nBal);
-  setCardResults('nInputVal', 'nOutputVal', 'nBalanceCard', 'nBalanceVal', nTotalIn, nTotalOut, nBal);
+  document.getElementById('balanceFlow').classList.add('visible');
+  setFlow('fNin','fNout','fNbalCard','fNbal', nIn, nOut, nBal);
+  setFlow('fPin','fPout','fPbalCard','fPbal', pIn, pOut, pBal);
+  setFlow('fKin','fKout','fKbalCard','fKbal', kIn, kOut, kBal);
+  setFlow('fSin','fSout','fSbalCard','fSbal', sIn, sOut, sBal);
 
-  // P block
-  showBlock('pBlock');
-  setResult('pUptake', pUp); setResult('pLeach', pLe);
-  setResult('pTotalIn', pTotalIn); setResult('pTotalOut', pTotalOut);
-  setBalanceResult('pBal', 'pBalRow', pBal);
-  setCardResults('pInputVal', 'pOutputVal', 'pBalanceCard', 'pBalanceVal', pTotalIn, pTotalOut, pBal);
+  document.getElementById('nutrientSection').classList.add('visible');
+  setNutrientCol('n', nIn, nUp, nLe, volatTotal, n2oTotal, nOut, nBal, true);
+  setNutrientCol('p', pIn, pUp, pLe, 0, 0, pOut, pBal, false);
+  setNutrientCol('k', kIn, kUp, kLe, 0, 0, kOut, kBal, false);
+  setNutrientCol('s', sIn, sUp, sLe, 0, 0, sOut, sBal, false);
 
-  // K block
-  showBlock('kBlock');
-  setResult('kUptake', kUp); setResult('kLeach', kLe);
-  setResult('kTotalIn', kTotalIn); setResult('kTotalOut', kTotalOut);
-  setBalanceResult('kBal', 'kBalRow', kBal);
-  setCardResults('kInputVal', 'kOutputVal', 'kBalanceCard', 'kBalanceVal', kTotalIn, kTotalOut, kBal);
-
-  // S block
-  showBlock('sBlock');
-  setResult('sUptake', sUp); setResult('sLeach', sLe);
-  setResult('sTotalIn', sTotalIn); setResult('sTotalOut', sTotalOut);
-  setBalanceResult('sBal', 'sBalRow', sBal);
-  setCardResults('sInputVal', 'sOutputVal', 'sBalanceCard', 'sBalanceVal', sTotalIn, sTotalOut, sBal);
-
-  // Recommendations
-  showBlock('recBlock');
-  document.getElementById('recN').textContent = fmt(Math.max(0, recNval));
-  document.getElementById('recP').textContent = fmt(Math.max(0, recPval));
-  document.getElementById('recK').textContent = fmt(Math.max(0, recKval));
-  document.getElementById('recS').textContent = fmt(Math.max(0, recSval));
+  document.getElementById('recBlock').classList.add('visible');
+  document.getElementById('recN').textContent = fmt(Math.max(0,recNv));
+  document.getElementById('recP').textContent = fmt(Math.max(0,recPv));
+  document.getElementById('recK').textContent = fmt(Math.max(0,recKv));
+  document.getElementById('recS').textContent = fmt(Math.max(0,recSv));
   document.getElementById('prevN').textContent = prev.N;
   document.getElementById('prevP').textContent = prev.P;
   document.getElementById('prevK').textContent = prev.K;
   document.getElementById('prevS').textContent = prev.S;
-  setAdj('adjN', adjNv); setAdj('adjP', adjPv);
-  setAdj('adjK', adjKv); setAdj('adjS', adjSv);
-}
-
-function showBlock(id) { document.getElementById(id).classList.add('visible'); }
-
-function setResult(id, v) {
-  document.getElementById(id).textContent = fmt(v);
-}
-
-function setBalanceResult(valId, rowId, v) {
-  const el = document.getElementById(valId);
-  const row = document.getElementById(rowId);
-  el.textContent = (v >= 0 ? '+' : '') + fmt(v);
-  row.classList.remove('pos','neg');
-  row.classList.add(v >= 0 ? 'pos' : 'neg');
-}
-
-function setCardResults(inId, outId, cardId, balId, inV, outV, balV) {
-  document.getElementById(inId).textContent = fmt(inV);
-  document.getElementById(outId).textContent = fmt(outV);
-  const card = document.getElementById(cardId);
-  const balEl = document.getElementById(balId);
-  balEl.textContent = (balV >= 0 ? '+' : '') + fmt(balV);
-  card.classList.remove('positive','negative');
-  card.classList.add(balV >= 0 ? 'positive' : 'negative');
-}
-
-function setAdj(id, v) {
-  const el = document.getElementById(id);
-  el.textContent = (v >= 0 ? '+' : '') + fmt(v);
-  el.className = 'rc-val ' + (v >= 0 ? 'rc-adj-pos' : 'rc-adj-neg');
-  el.style.fontSize = '1rem';
+  setAdj('adjN', recNv-prev.N); setAdj('adjP', recPv-prev.P);
+  setAdj('adjK', recKv-prev.K); setAdj('adjS', recSv-prev.S);
 }
 
 updateClay();
 </script>
+
 </body>
 </html>
