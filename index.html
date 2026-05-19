@@ -775,11 +775,11 @@ footer a:hover { color: var(--green-light); }
     <div class="panel-section">
       <div class="section-label">Yield</div>
       <div class="field-row">
-        <span class="field-label" id="grainLabel">Tuber / Grain yield <span class="field-unit">t ha⁻¹</span></span>
+        <span class="field-label" id="grainLabel">Tuber yield <span class="field-unit">t ha⁻¹</span></span>
         <input class="field-input" type="number" id="grainYield" value="20" min="0" step="0.1">
       </div>
       <div class="field-row">
-        <span class="field-label" id="strawLabel">Haulm / Straw yield <span class="field-unit">t ha⁻¹</span></span>
+        <span class="field-label" id="strawLabel">Haulm yield <span class="field-unit">t ha⁻¹</span></span>
         <input class="field-input" type="number" id="strawYield" value="10" min="0" step="0.1">
       </div>
     </div>
@@ -844,7 +844,6 @@ footer a:hover { color: var(--green-light); }
       <div class="cib-item"><div class="cib-label">Crop</div><div class="cib-val" id="cibName">—</div></div>
       <div class="cib-item"><div class="cib-label">Season</div><div class="cib-val" id="cibSeason">—</div></div>
       <div class="cib-item"><div class="cib-label">Period</div><div class="cib-val" id="cibPeriod">—</div></div>
-      <div class="cib-item"><div class="cib-label">Moisture basis</div><div class="cib-val" id="cibMoisture">—</div></div>
     </div>
 
     <!-- Balance flow summary -->
@@ -1026,10 +1025,11 @@ footer a:hover { color: var(--green-light); }
       <div class="method-body" id="methodBody">
         <p><strong>Nutrient balance framework.</strong> The model estimates the difference between total nutrient inputs and total nutrient outputs for each element. A positive balance indicates a net surplus remaining in the soil; a negative balance indicates soil depletion requiring corrective fertilization.</p>
         <p><strong>Leaching losses.</strong> Leaching is estimated using element-specific multiple regression equations incorporating applied nutrient rate, soil sand fraction, silt fraction, and clay fraction. A regression-based approach was chosen over fixed-fraction methods because leaching is strongly texture-dependent — sandy soils lose substantially more nitrogen and potassium than clay-rich soils under the same rainfall.</p>
-        <p><strong>Nitrogen gaseous losses.</strong> Volatilization (NH₃) and nitrous oxide (N₂O) are modelled separately, each with its own regression equation. Volatilization coefficients include applied nitrogen rate, soil organic carbon, pH, mineral nitrogen, and seasonal rainfall. N₂O coefficients additionally incorporate soil nitrate (NO₃⁻). These pathways are kept separate because they have distinct drivers: volatilization is dominated by pH and organic matter interactions, while N₂O production is driven by denitrification linked to nitrate availability.</p>
+        <p><strong>Greenhouse gas emissions — N₂O and volatilization.</strong> Nitrous oxide (N₂O) and ammonia volatilization (NH₃) are modelled as separate nitrogen output pathways, each with its own regression equation derived from field gas flux measurements. N₂O emissions are estimated as a function of applied nitrogen rate, soil nitrate (NO₃⁻), organic carbon, pH, and seasonal rainfall — consistent with the understanding that N₂O production is primarily driven by denitrification under high nitrate availability and microbial activity. Ammonia volatilization coefficients incorporate applied nitrogen rate, soil organic carbon, pH, and mineral nitrogen. Both pathways also account for additional N₂O and NH₃ inputs from organic amendments (cow dung, farmyard manure, poultry manure) and retained crop residues, recognizing that organic nitrogen inputs carry substantial GHG implications beyond synthetic fertilizer. Separating these two gaseous pathways allows the model to reflect their distinct soil chemistry — volatilization is most sensitive to pH and organic matter interactions, while N₂O flux responds more strongly to denitrification substrate availability. The model thus quantifies not only the agronomic nutrient balance but also the greenhouse gas cost of current fertilization and organic management practices, providing a basis for identifying management scenarios that reduce N₂O emissions while maintaining crop-available nitrogen.</p>
         <p><strong>Organic amendments.</strong> Cow dung, farmyard manure, and poultry manure each contribute fixed quantities of nitrogen, phosphorus, potassium, and sulfur per tonne, derived from average nutrient content measurements from Bangladesh field experiments. Crop residue retention contributes nutrients per inch of standing stubble with crop-specific coefficients.</p>
         <p><strong>Zero-balance recommendation.</strong> The adjusted dose for neutral balance is back-calculated from the balance equation, corrected by a nutrient use efficiency factor reflecting fertilizer recovery differences across crops and nutrients.</p>
         <p><strong>Validation.</strong> Model coefficients were derived from and validated against field experimental data from three Bangladesh agroecological zones: AEZ 28 (Bogura), AEZ 30 (Cumilla), and AEZ 7 (Mymensingh), covering a range of soil textures, rainfall regimes, and agronomic management practices.</p>
+        <p style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--line)"><strong>Limitations.</strong> The regression coefficients underpinning leaching, volatilization, and N₂O outputs were calibrated from experimental data collected within Bangladesh agroecological zones. The model is therefore most reliable for tropical lowland rice and potato systems within the range of soil and climate conditions represented by those datasets. Application to soil textures, rainfall regimes, or cropping systems substantially outside this range should be treated with caution. Nutrient uptake constants are fixed averages from experimental data and do not account for varietal differences, crop stress, or inter-seasonal yield variation. The N₂O pathway does not model CH₄ emissions, which are significant under flooded rice conditions and would require separate treatment in full greenhouse gas accounting. Atmospheric nitrogen deposition, biological nitrogen fixation, and irrigation water nutrient loads are not included as inputs. The model also assumes steady-state soil conditions and does not track soil nutrient pool dynamics over multiple seasons. These limitations point toward directions for future refinement — particularly integration of direct gas flux measurements and dynamic soil nitrogen modelling — which are active research priorities in the field.</p>
       </div>
     </div>
 
@@ -1076,17 +1076,6 @@ footer a:hover { color: var(--green-light); }
       <div class="author-attr-box">
         <strong>Methodology statement:</strong> The nutrient balance equations, crop-specific regression coefficients for leaching and gaseous losses, organic amendment nutrient content constants, moisture correction factors, and agronomic efficiency parameters in this calculator were independently developed by Md Kamruzzaman, based on field experimental data collected across three agroecological zones of Bangladesh (Bogura, Cumilla, Mymensingh). This open-source web implementation is the author's own version of that work, published here to make the methodology freely accessible to researchers and practitioners.
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- ── CITATION ── -->
-<div class="cite-wrap">
-  <div class="cite-block">
-    <div class="cite-head">How to cite this tool</div>
-    <div class="cite-body">
-      <div class="cite-text">Kamruzzaman, Md. (2024). Soil Nutrient Balance Calculator for Major Bangladesh Cropping Systems [Web application]. Department of Soil Science, Bangladesh Agricultural University. Available at: https://kamruzzaman17.github.io/NBCtool/</div>
-      <p class="cite-note">For academic collaboration or correspondence, contact kamruzzaman.swe@gmail.com</p>
     </div>
   </div>
 </div>
@@ -1213,6 +1202,10 @@ function selectCrop(crop,btn){
   sv('grainYield',d.grainYield);sv('strawYield',d.strawYield);
   sv('nRate',d.nRate);sv('pRate',d.pRate);sv('kRate',d.kRate);sv('sRate',d.sRate);
   sv('rainfall',d.rainfall);sv('cowDung',d.cowDung||0);
+  // Update yield labels based on crop
+  const isPotato = crop === 'potato';
+  document.getElementById('grainLabel').innerHTML = (isPotato ? 'Tuber yield' : 'Grain yield') + ' <span class="field-unit">t ha⁻¹</span>';
+  document.getElementById('strawLabel').innerHTML = (isPotato ? 'Haulm yield' : 'Straw yield') + ' <span class="field-unit">t ha⁻¹</span>';
   hideResults();
 }
 function sv(id,v){document.getElementById(id).value=v;}
@@ -1293,7 +1286,6 @@ function calculate(){
   document.getElementById('cibName').textContent=crop.name+' ('+crop.scientific+')';
   document.getElementById('cibSeason').textContent=crop.season;
   document.getElementById('cibPeriod').textContent=crop.period;
-  document.getElementById('cibMoisture').textContent='Grain '+(mg*100).toFixed(0)+'% DM · Straw '+(ms*100).toFixed(0)+'% DM';
 
   document.getElementById('balanceFlow').classList.add('visible');
   setFlow('fNin','fNout','fNcard','fNbal',nIn,nOut,nBal);
