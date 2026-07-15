@@ -1098,15 +1098,24 @@ const CROPS = {
     effFactor: {N:0.9,P:1.0,K:0.7,S:1.1},
     defaultInputs:{grainYield:20,strawYield:10,nRate:140,pRate:40,kRate:90,sRate:10,rainfall:250,cowDung:5},
     leachCoef:{
-      N:{rate:0.00469,sand:0.056,silt:0.036,clay:-0.056,intercept:-1.01},
-      P:{rate:0.0209, sand:0.056,silt:0.036,clay:-0.056,intercept:3.0},
-      K:{rate:0.00997,sand:0.056,silt:0.036,clay:-0.056,intercept:3.0},
-      S:{rate:0.0425, sand:0.056,silt:0.036,clay:-0.056,intercept:0.1}
+      N:{rate:0.0047,  sand:0.056,silt:0.036,clay:-0.056,intercept:-1.01},
+      P:{rate:0.0209,  sand:0.056,silt:0.036,clay:-0.056,intercept:3.0},
+      K:{rate:0.00997, sand:0.056,silt:0.036,clay:-0.056,intercept:3.0},
+      S:{rate:0.0425,  sand:0.056,silt:0.036,clay:-0.056,intercept:0.1}
     },
-    volatCoef:{intercept:0,nRate:0.04695,organicC:0.14554,pH:0.01,mineralN:0.02,rainfall:0.000621},
-    n2oCoef:  {intercept:3.4901,nRate:0.07043,no3:0.05200,organicC:0.1455,pH:0.03,rainfall:0.000621},
-    totalInputCoef:{N:{rate:1.008,rainfall:0.000621},P:{rate:1.0079,rainfall:0.00347},K:{rate:1.0182,rainfall:0.00682},S:{rate:1.177,rainfall:0.00028}},
-    residueCoef:{N:1.0,P:0.275,K:0.3,S:0.25}
+    // Volatilization: intercept + nRate + mineralN + organicC(coef=1.03) + pH  [NO rainfall]
+    volatCoef:{intercept:0, nRate:0.04694897946499712, mineralN:0.02, organicC:1.03, pH:0.01},
+    // N2O: intercept + nRate + no3 + organicC + pH + totalN  [NO rainfall]
+    n2oCoef:  {intercept:3.490064374685253, nRate:0.07042685432368817, no3:0.05200334315676225, organicC:0.1455439776266794, pH:0.03, totalN:0.015983739036592767},
+    // Total input: rate*coef + rainfall*coef + intercept + organic + residue
+    totalInputCoef:{
+      N:{rate:1.008,   rainfall:0.000621, intercept:10.43},
+      P:{rate:1.0079,  rainfall:0.00347,  intercept:-1.0},
+      K:{rate:1.0182,  rainfall:0.00682,  intercept:0.9},
+      S:{rate:1.177,   rainfall:0.00028,  intercept:-0.97}
+    },
+    residueCoef:{N:1.0,P:0.275,K:0.3,S:0.25},
+    residueVolat:0.25  // kg volatilization per inch residue (Potato-specific)
   },
   boro: {
     name:'Boro Rice', scientific:'Oryza sativa (irrigated)',
@@ -1118,15 +1127,21 @@ const CROPS = {
     effFactor: {N:0.8,P:1.0,K:1.0,S:1.0},
     defaultInputs:{grainYield:6,strawYield:6.5,nRate:150,pRate:16,kRate:77,sRate:12,rainfall:553,cowDung:3},
     leachCoef:{
-      N:{rate:0.00464,sand:0.056,silt:0.036,clay:-0.056,intercept:5.123},
-      P:{rate:0.0209, sand:0.056,silt:0.036,clay:-0.056,intercept:1.0},
-      K:{rate:0.00997,sand:0.056,silt:0.036,clay:-0.056,intercept:1.03},
-      S:{rate:0.0425, sand:0.056,silt:0.036,clay:-0.056,intercept:0.1}
+      N:{rate:0.00464, sand:0.056,silt:0.036,clay:-0.056,intercept:5.12304},
+      P:{rate:0.0209,  sand:0.056,silt:0.036,clay:-0.056,intercept:1.0},
+      K:{rate:0.00997, sand:0.056,silt:0.036,clay:-0.056,intercept:1.03},
+      S:{rate:0.0425,  sand:0.056,silt:0.036,clay:-0.056,intercept:0.1}
     },
-    volatCoef:{intercept:-5.123,nRate:0.15643,organicC:0.09633,pH:0.01,mineralN:0.05,rainfall:0.000621},
-    n2oCoef:  {intercept:6.3005,nRate:0.03770,no3:0.05665,organicC:0.09633,pH:0.13,rainfall:0.000621},
-    totalInputCoef:{N:{rate:1.0049,rainfall:0.000621},P:{rate:1.0262,rainfall:0.00347},K:{rate:1.011,rainfall:0.00682},S:{rate:1.041,rainfall:0.00028}},
-    residueCoef:{N:1.0,P:0.275,K:1.5,S:0.2625}
+    volatCoef:{intercept:-5.12304347826086, nRate:0.15643098123069607, mineralN:0.05, organicC:1.03, pH:0.01},
+    n2oCoef:  {intercept:6.30046113306983,  nRate:0.03770419807483244, no3:0.056650222199883, organicC:0.09632634353068, pH:0.13, totalN:0.119965982826754},
+    totalInputCoef:{
+      N:{rate:1.0049,  rainfall:0.000621, intercept:17.84},
+      P:{rate:1.0262,  rainfall:0.00347,  intercept:2.04},
+      K:{rate:1.011,   rainfall:0.00682,  intercept:1.4},
+      S:{rate:1.041,   rainfall:0.00028,  intercept:1.44}
+    },
+    residueCoef:{N:1.0,P:0.275,K:1.5,S:0.2625},
+    residueVolat:0.5
   },
   aus: {
     name:'T. Aus Rice', scientific:'Oryza sativa (pre-monsoon)',
@@ -1138,15 +1153,21 @@ const CROPS = {
     effFactor: {N:0.6,P:1.0,K:0.9,S:1.0},
     defaultInputs:{grainYield:4.5,strawYield:5.5,nRate:70,pRate:8,kRate:40,sRate:6,rainfall:1254,cowDung:0},
     leachCoef:{
-      N:{rate:0.0097,sand:0.056,silt:0.036,clay:-0.056,intercept:4.65},
-      P:{rate:0.043, sand:0.056,silt:0.036,clay:-0.056,intercept:0.02},
-      K:{rate:0.013, sand:0.056,silt:0.036,clay:-0.056,intercept:0.1},
-      S:{rate:0.083, sand:0.056,silt:0.036,clay:-0.056,intercept:0.1}
+      N:{rate:0.0097, sand:0.056,silt:0.036,clay:-0.056,intercept:4.65},
+      P:{rate:0.043,  sand:0.056,silt:0.036,clay:-0.056,intercept:0.02},
+      K:{rate:0.013,  sand:0.056,silt:0.036,clay:-0.056,intercept:0.1},
+      S:{rate:0.083,  sand:0,    silt:0.036,clay:-0.056,intercept:0.1}  // sand=0 for T.Aus S
     },
-    volatCoef:{intercept:-0.4129,nRate:0.24343,organicC:0.09633,pH:0.01,mineralN:0.05,rainfall:0.000621},
-    n2oCoef:  {intercept:2.5,nRate:0.07681,no3:0.05665,organicC:0.09633,pH:0.13,rainfall:0.000621},
-    totalInputCoef:{N:{rate:1.01,rainfall:0.000621},P:{rate:1.015,rainfall:0.00347},K:{rate:1.01145,rainfall:0.00682},S:{rate:1.072,rainfall:0.00028}},
-    residueCoef:{N:1.5,P:0.3125,K:1.0,S:0.25}
+    volatCoef:{intercept:-0.4129272531453445, nRate:0.24342952954423058, mineralN:0.05, organicC:1.03, pH:0.01},
+    n2oCoef:  {intercept:2.5, nRate:0.07680758235905834, no3:0.056650222199883, organicC:0.09632634353068, pH:0.13, totalN:0.119965982826754},
+    totalInputCoef:{
+      N:{rate:1.01,    rainfall:0.000621, intercept:16.74},
+      P:{rate:1.015,   rainfall:0.00347,  intercept:3.76},
+      K:{rate:1.01145, rainfall:0.00682,  intercept:3.74},
+      S:{rate:1.072,   rainfall:0.00028,  intercept:3.42}
+    },
+    residueCoef:{N:1.5,P:0.3125,K:1.0,S:0.25},
+    residueVolat:0.5
   },
   aman: {
     name:'T. Aman Rice', scientific:'Oryza sativa (monsoon)',
@@ -1158,15 +1179,21 @@ const CROPS = {
     effFactor: {N:0.7,P:1.0,K:1.0,S:1.0},
     defaultInputs:{grainYield:4.5,strawYield:5,nRate:90,pRate:7,kRate:50,sRate:4,rainfall:888,cowDung:0},
     leachCoef:{
-      N:{rate:0.0049,sand:0.056,silt:0.036,clay:-0.056,intercept:5.0},
-      P:{rate:0.0209,sand:0.056,silt:0.036,clay:-0.056,intercept:0.5},
-      K:{rate:0.013, sand:0.056,silt:0.036,clay:-0.056,intercept:1.0},
-      S:{rate:0.083, sand:0.056,silt:0.036,clay:-0.056,intercept:0.01}
+      N:{rate:0.0049, sand:0.056,silt:0.036,clay:-0.056,intercept:5.0},
+      P:{rate:0.0209, sand:0.056,silt:0.036,clay:-0.056,intercept:0.5},
+      K:{rate:0.013,  sand:0.056,silt:0.036,clay:-0.056,intercept:1.0},
+      S:{rate:0.083,  sand:0.056,silt:0.036,clay:-0.056,intercept:0.01}
     },
-    volatCoef:{intercept:-1.2039,nRate:0.29091,organicC:0.09633,pH:0.01,mineralN:0.05,rainfall:0.000621},
-    n2oCoef:  {intercept:4.9959,nRate:0.06368,no3:0.05665,organicC:0.09633,pH:0.13,rainfall:0.000621},
-    totalInputCoef:{N:{rate:1.0087,rainfall:0.000621},P:{rate:1.03,rainfall:0.00347},K:{rate:1.0102,rainfall:0.00682},S:{rate:1.071,rainfall:0.00028}},
-    residueCoef:{N:1.25,P:0.275,K:1.525,S:0.3}
+    volatCoef:{intercept:-1.2039458554031413, nRate:0.290910747430848, mineralN:0.05, organicC:1.03, pH:0.01},
+    n2oCoef:  {intercept:4.99591549063911,    nRate:0.06368225237571973, no3:0.056650222199883, organicC:0.09632634353068, pH:0.13, totalN:0.119965982826754},
+    totalInputCoef:{
+      N:{rate:1.0087, rainfall:0.000621, intercept:16.41},
+      P:{rate:1.03,   rainfall:0.00347,  intercept:2.28},
+      K:{rate:1.0102, rainfall:0.00682,  intercept:2.57},
+      S:{rate:1.071,  rainfall:0.00028,  intercept:3.98}
+    },
+    residueCoef:{N:1.25,P:0.275,K:1.525,S:0.3},
+    residueVolat:0.5
   },
   maize: {
     name:'Maize', scientific:'Zea mays',
@@ -1178,20 +1205,26 @@ const CROPS = {
     effFactor: {N:0.7,P:1.0,K:1.0,S:1.0},
     defaultInputs:{grainYield:9,strawYield:5,nRate:225,pRate:60,kRate:80,sRate:30,rainfall:226,cowDung:0},
     leachCoef:{
-      N:{rate:0.0209, sand:0.056,silt:0.036,clay:-0.056,intercept:3.0},
-      P:{rate:0.00997,sand:0.056,silt:0.036,clay:-0.056,intercept:1.5},
-      K:{rate:0.0425, sand:0.056,silt:0.036,clay:-0.056,intercept:-2.0},
-      S:{rate:0.083,  sand:0.056,silt:0.036,clay:-0.056,intercept:2.0}
+      N:{rate:0.0209,  sand:0.056,silt:0.036,clay:-0.056,intercept:3.0},
+      P:{rate:0.00997, sand:0.056,silt:0.036,clay:-0.056,intercept:1.5},
+      K:{rate:0.0425,  sand:0.056,silt:0.036,clay:-0.056,intercept:-2.0},
+      S:{rate:0.083,   sand:0.056,silt:0.036,clay:-0.056,intercept:2.0}
     },
-    volatCoef:{intercept:-1.7934,nRate:0.33778,organicC:0.09633,pH:0.01,mineralN:0.05,rainfall:0.000621},
-    n2oCoef:  {intercept:0.2104,nRate:0.06157,no3:0.05665,organicC:0.09633,pH:0.13,rainfall:0.000621},
-    totalInputCoef:{N:{rate:1.0032,rainfall:0.000621},P:{rate:1.0118,rainfall:0.00347},K:{rate:1.0124,rainfall:0.00682},S:{rate:1.0257,rainfall:0.00028}},
-    residueCoef:{N:0.75,P:0.3,K:2.0,S:0.5}
+    volatCoef:{intercept:-1.7934481711594756, nRate:0.3377800791543696, mineralN:0.05, organicC:1.03, pH:0.01},
+    n2oCoef:  {intercept:0.21036625617175808, nRate:0.061569698422439464, no3:0.056650222199883, organicC:0.09632634353068, pH:0.13, totalN:0.119965982826754},
+    totalInputCoef:{
+      N:{rate:1.0032,  rainfall:0.000621, intercept:15.23},
+      P:{rate:1.0118,  rainfall:0.00347,  intercept:1.76},
+      K:{rate:1.0124,  rainfall:0.00682,  intercept:2.87},
+      S:{rate:1.0257,  rainfall:0.00028,  intercept:2.1}
+    },
+    residueCoef:{N:0.75,P:0.3,K:2.0,S:0.5},
+    residueVolat:0.5
   }
 };
 
 const ORGANIC={cowDung:{N:5,P:1.5,K:2.3,S:0.8},farmyard:{N:3,P:0.7,K:2.5,S:0.9},poultry:{N:6,P:3.5,K:4.8,S:1.1}};
-const VTTON={volaT:0.4,n2o:0.4}, VTINCH={volaT:0.25,n2o:0.025};
+const VTTON={volaT:0.4,n2o:0.4}, N2O_PER_INCH=0.025;
 let currentCrop='potato';
 
 function selectCrop(crop,btn){
@@ -1255,7 +1288,7 @@ function toggleMethod(){
 function calculate(){
   const crop=CROPS[currentCrop];
   const sand=gv('sand'),silt=gv('silt'),clay=gv('clay');
-  const rainfall=gv('rainfall'),ph=gv('ph'),mineralN=gv('mineralN'),no3=gv('no3'),organicC=gv('organicC');
+  const rainfall=gv('rainfall'),ph=gv('ph'),mineralN=gv('mineralN'),no3=gv('no3'),organicC=gv('organicC'),totalNpct=gv('totalN');
   const grainYield=gv('grainYield'),strawYield=gv('strawYield');
   const nRate=gv('nRate'),pRate=gv('pRate'),kRate=gv('kRate'),sRate=gv('sRate');
   const cowDung=gv('cowDung'),farmyard=gv('farmyard'),poultry=gv('poultry'),residue=gv('residue');
@@ -1266,10 +1299,22 @@ function calculate(){
   const orgIn=nu=>cowDung*ORGANIC.cowDung[nu]+farmyard*ORGANIC.farmyard[nu]+poultry*ORGANIC.poultry[nu];
   const orgTons=cowDung+farmyard+poultry;
   const vc=crop.volatCoef,nc=crop.n2oCoef;
-  const voT=Math.max(0,vc.intercept+vc.nRate*nRate+vc.organicC*organicC+vc.pH*ph+vc.mineralN*mineralN+vc.rainfall*rainfall+orgTons*VTTON.volaT+residue*VTINCH.volaT);
-  const n2T=Math.max(0,nc.intercept+nc.nRate*nRate+nc.no3*no3+nc.organicC*organicC+nc.pH*ph+nc.rainfall*rainfall+orgTons*VTTON.n2o+residue*VTINCH.n2o);
+
+  // Volatilization: intercept + nRate + mineralN + organicC(1.03) + pH  [no rainfall term]
+  const voT=Math.max(0,
+    vc.intercept + vc.nRate*nRate + vc.mineralN*mineralN + vc.organicC*organicC + vc.pH*ph
+    + orgTons*VTTON.volaT + residue*crop.residueVolat
+  );
+
+  // N2O: intercept + nRate + no3 + organicC + pH + totalN  [no rainfall term]
+  const n2T=Math.max(0,
+    nc.intercept + nc.nRate*nRate + nc.no3*no3 + nc.organicC*organicC + nc.pH*ph + nc.totalN*totalNpct
+    + orgTons*VTTON.n2o + residue*N2O_PER_INCH
+  );
+
   const resIn={N:residue*crop.residueCoef.N,P:residue*crop.residueCoef.P,K:residue*crop.residueCoef.K,S:residue*crop.residueCoef.S};
-  const totIn=(nu,rate)=>{const tc=crop.totalInputCoef[nu];return tc.rate*rate+tc.rainfall*rainfall+orgIn(nu)+resIn[nu];};
+  // Total input: rate*coef + rainfall*coef + intercept + organic + residue
+  const totIn=(nu,rate)=>{const tc=crop.totalInputCoef[nu];return tc.rate*rate+tc.rainfall*rainfall+tc.intercept+orgIn(nu)+resIn[nu];};
 
   const nIn=totIn('N',nRate),pIn=totIn('P',pRate),kIn=totIn('K',kRate),sIn=totIn('S',sRate);
   const nUp=uptake('N'),pUp=uptake('P'),kUp=uptake('K'),sUp=uptake('S');
