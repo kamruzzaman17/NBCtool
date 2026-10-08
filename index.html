@@ -4,26 +4,35 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Soil Nutrient Balance Calculator — Md Kamruzzaman</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="description" content="Open web calculator for field-scale N, P, K and S balances and zero-balance fertilizer rates for five Bangladesh cropping systems. Model by Md Kamruzzaman.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kamruzzaman17.github.io/NBCtool/">
+<meta property="og:title" content="Soil Nutrient Balance Calculator">
+<meta property="og:description" content="N, P, K and S balances and zero-balance fertilizer rates for potato, Boro, T. Aus and T. Aman rice, and maize. Validated in three agroecological zones of Bangladesh.">
+<meta property="og:image" content="https://lh3.googleusercontent.com/d/1ytfG-8_i_IFfsPWKe0G1wPF0Gqr1MD9c=w600">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2322170F'/><rect x='6' y='8' width='20' height='4' rx='1' fill='%234F6B3A'/><rect x='6' y='14' width='20' height='4' rx='1' fill='%239C4F22'/><rect x='6' y='20' width='20' height='4' rx='1' fill='%23C9A26B'/></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --ink:        #0f1117;
-  --ink2:       #2c2f3a;
-  --mid:        #5a5f72;
-  --faint:      #8b90a0;
-  --line:       #e2e4ea;
-  --bg:         #f7f6f2;
+  /* Soil-profile palette, shared with the portfolio */
+  --ink:        #22170F;
+  --ink2:       #3E2A1E;
+  --mid:        #6B5A4C;
+  --faint:      #8A7765;
+  --line:       #E8DFD3;
+  --bg:         #FAF7F2;
   --white:      #ffffff;
-  --green:      #2d6a4f;
-  --green-light:#52b788;
-  --green-pale: #d8f3dc;
-  --green-dark: #1b4332;
-  --positive:   #2d6a4f;
+  --green:      #9C4F22;
+  --green-light:#E0A458;
+  --green-pale: #F3EBE1;
+  --green-dark: #5A3A22;
+  --positive:   #4F6B3A;
   --negative:   #9b2226;
-  --serif:      'Cormorant Garamond', Georgia, serif;
+  --moss:       #4F6B3A;
+  --serif:      'Source Serif 4', Georgia, serif;
   --sans:       'DM Sans', system-ui, sans-serif;
   --mono:       'DM Mono', monospace;
 }
@@ -41,7 +50,7 @@ body {
 /* ── NAV ── */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-  background: rgba(247,246,242,0.95);
+  background: rgba(250,247,242,0.95);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--line);
   padding: 0 2.5rem;
@@ -70,7 +79,7 @@ nav {
   padding: 3px 10px;
   border-radius: 20px;
   letter-spacing: 0.06em;
-  border: 1px solid #b7e4c7;
+  border: 1px solid #E6D3BC;
 }
 
 /* ── HERO ── */
@@ -84,7 +93,7 @@ nav {
 .hero::before {
   content: '';
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 80% 50%, rgba(45,106,79,0.18) 0%, transparent 65%);
+  background: radial-gradient(ellipse at 80% 50%, rgba(156,79,34,0.18) 0%, transparent 65%);
   pointer-events: none;
 }
 .hero-inner {
@@ -106,7 +115,7 @@ nav {
 .hero-title {
   font-family: var(--serif);
   font-size: 3rem;
-  font-weight: 300;
+  font-weight: 600;
   color: var(--white);
   line-height: 1.15;
   margin-bottom: 0.75rem;
@@ -126,9 +135,9 @@ nav {
   letter-spacing: 0.08em;
   padding: 5px 14px;
   border-radius: 20px;
-  border: 1px solid rgba(82,183,136,0.3);
+  border: 1px solid rgba(224,164,88,0.3);
   color: rgba(255,255,255,0.6);
-  background: rgba(82,183,136,0.08);
+  background: rgba(224,164,88,0.08);
 }
 .hero-right { text-align: right; }
 .hero-stat {
@@ -153,7 +162,7 @@ nav {
 /* ── ATTRIBUTION BAR ── */
 .attr-bar {
   background: var(--green-dark);
-  border-bottom: 1px solid rgba(82,183,136,0.15);
+  border-bottom: 1px solid rgba(224,164,88,0.15);
   padding: 0.875rem 2.5rem;
 }
 .attr-bar-inner {
@@ -312,7 +321,7 @@ nav {
 /* ── CROP INFO BAR ── */
 .crop-info-bar {
   background: var(--green-pale);
-  border: 1px solid #b7e4c7; border-radius: 4px;
+  border: 1px solid #E6D3BC; border-radius: 4px;
   padding: 0.875rem 1.25rem;
   display: none; gap: 2.5rem; flex-wrap: wrap; align-items: center;
 }
@@ -378,7 +387,7 @@ nav {
   padding: 0.5rem 0.6rem; border-radius: 3px;
   display: flex; justify-content: space-between; align-items: center;
 }
-.flow-balance.pos { background: #f0faf5; border: 1px solid #b7e4c7; }
+.flow-balance.pos { background: #EEF2E8; border: 1px solid #C9D6BC; }
 .flow-balance.neg { background: #fff4f4; border: 1px solid #f5c6c6; }
 .flow-bal-lbl { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); }
 .flow-bal-val { font-family: var(--mono); font-size: 1.05rem; font-weight: 600; }
@@ -427,7 +436,7 @@ nav {
   padding: 0.5rem 0.6rem; border-radius: 3px;
   display: flex; justify-content: space-between; align-items: center;
 }
-.nc-balance.pos { background: #f0faf5; border: 1px solid #b7e4c7; }
+.nc-balance.pos { background: #EEF2E8; border: 1px solid #C9D6BC; }
 .nc-balance.neg { background: #fff4f4; border: 1px solid #f5c6c6; }
 .nc-bal-lbl { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); }
 .nc-bal-val { font-family: var(--mono); font-size: 1rem; font-weight: 600; }
@@ -516,7 +525,7 @@ nav {
   display: grid; grid-template-columns: 260px 1fr;
 }
 .author-sidebar {
-  background: #070a0f;
+  background: #140D08;
   padding: 2.5rem 1.75rem;
   display: flex; flex-direction: column;
   align-items: center; gap: 1.25rem;
@@ -525,12 +534,12 @@ nav {
 .author-photo {
   width: 100px; height: 100px; border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(82,183,136,0.4);
+  border: 2px solid rgba(224,164,88,0.4);
 }
 .author-photo-fallback {
   width: 100px; height: 100px; border-radius: 50%;
-  background: rgba(82,183,136,0.15);
-  border: 2px solid rgba(82,183,136,0.35);
+  background: rgba(224,164,88,0.15);
+  border: 2px solid rgba(224,164,88,0.35);
   display: flex; align-items: center; justify-content: center;
   font-family: var(--serif); font-size: 2rem;
   color: var(--green-light); letter-spacing: -1px;
@@ -552,9 +561,9 @@ nav {
   transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 .author-link:hover {
-  background: rgba(82,183,136,0.15);
+  background: rgba(224,164,88,0.15);
   color: var(--green-light);
-  border-color: rgba(82,183,136,0.3);
+  border-color: rgba(224,164,88,0.3);
 }
 .author-link svg { width: 12px; height: 12px; fill: currentColor; flex-shrink: 0; }
 .author-main { padding: 2.5rem 2rem; }
@@ -574,8 +583,8 @@ nav {
   max-width: 560px;
 }
 .author-attr-box {
-  background: rgba(82,183,136,0.07);
-  border: 1px solid rgba(82,183,136,0.2);
+  background: rgba(224,164,88,0.07);
+  border: 1px solid rgba(224,164,88,0.2);
   border-left: 3px solid var(--green-light);
   border-radius: 3px;
   padding: 1rem 1.25rem;
@@ -616,6 +625,26 @@ footer {
 }
 footer a { color: rgba(255,255,255,0.45); text-decoration: none; }
 footer a:hover { color: var(--green-light); }
+
+/* ── TOOLS: validation, actions, chart ── */
+.input-msg { display:none; margin: 0 1.5rem; padding: .6rem .75rem; border-radius: 3px;
+  background:#fff4f4; border:1px solid #f5c6c6; color: var(--negative); font-size: 12px; line-height: 1.5; }
+.input-msg.show { display:block; }
+.action-bar { display:none; gap:.6rem; flex-wrap:wrap; align-items:center; }
+.action-bar.visible { display:flex; }
+.act-btn { font-family: var(--mono); font-size: 11px; letter-spacing: .04em;
+  padding: .5rem .9rem; border-radius: 3px; cursor: pointer;
+  background: var(--white); color: var(--ink2); border: 1px solid var(--line); transition: all .2s; }
+.act-btn:hover { border-color: var(--green); color: var(--green); }
+.act-note { font-family: var(--mono); font-size: 10.5px; color: var(--positive); }
+.chart-block { background: var(--white); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; display: none; }
+.chart-block.visible { display: block; }
+.chart-body { padding: 1.25rem 1.5rem 1rem; }
+@media (max-width: 600px) { .chart-body { padding: 1rem .75rem .75rem; } .chart-legend { padding: 0 .75rem 1rem; gap:.6rem 1rem; } }
+.chart-body svg { width: 100%; height: auto; display: block; }
+.chart-legend { display:flex; gap:1.1rem; flex-wrap:wrap; padding: 0 1.5rem 1.1rem; font-family: var(--mono); font-size: 10.5px; color: var(--mid); }
+.chart-legend span { display:inline-flex; align-items:center; gap:.4rem; }
+.chart-legend i { width: 11px; height: 11px; border-radius: 2px; display:inline-block; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 960px) {
@@ -828,7 +857,8 @@ footer a:hover { color: var(--green-light); }
       </div>
     </div>
 
-    <button class="calc-btn" onclick="calculate()">Calculate nutrient balance →</button>
+    <div class="input-msg" id="inputMsg" role="alert"></div>
+    <button class="calc-btn" onclick="runCalc()">Calculate nutrient balance →</button>
   </aside>
 
   <!-- RESULTS -->
@@ -844,6 +874,13 @@ footer a:hover { color: var(--green-light); }
       <div class="cib-item"><div class="cib-label">Crop</div><div class="cib-val" id="cibName">—</div></div>
       <div class="cib-item"><div class="cib-label">Season</div><div class="cib-val" id="cibSeason">—</div></div>
       <div class="cib-item"><div class="cib-label">Period</div><div class="cib-val" id="cibPeriod">—</div></div>
+    </div>
+
+    <!-- Share / export -->
+    <div class="action-bar" id="actionBar">
+      <button class="act-btn" onclick="copyScenarioLink()">Copy link to this scenario</button>
+      <button class="act-btn" onclick="downloadCSV()">Download results (CSV)</button>
+      <span class="act-note" id="actNote" aria-live="polite"></span>
     </div>
 
     <!-- Balance flow summary -->
@@ -893,6 +930,22 @@ footer a:hover { color: var(--green-light); }
             <span class="flow-bal-val" id="fSbal">—</span>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Pathway chart -->
+    <div class="chart-block" id="chartBlock">
+      <div class="block-head">
+        <span class="block-head-title">Where the nutrients go</span>
+        <span class="block-head-sub">Output pathways vs total input · kg ha⁻¹</span>
+      </div>
+      <div class="chart-body" id="chartBody"></div>
+      <div class="chart-legend">
+        <span><i style="background:#4F6B3A"></i>Crop uptake</span>
+        <span><i style="background:#3D6E8C"></i>Leaching</span>
+        <span><i style="background:#C9A227"></i>NH₃ volatilization</span>
+        <span><i style="background:#9C4F22"></i>N₂O emission</span>
+        <span><i style="background:#22170F;width:3px"></i>Total input</span>
       </div>
     </div>
 
@@ -1059,6 +1112,10 @@ footer a:hover { color: var(--green-light); }
           <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
           ResearchGate
         </a>
+        <a class="author-link" href="https://orcid.org/0000-0002-5398-5371" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM8.3 17.3H6.6V9.2h1.7v8.1zM7.4 8.1a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm10.1 5.1c0 2.4-1.7 4.1-4.2 4.1h-3.1V9.2h3.1c2.5 0 4.2 1.7 4.2 4zm-1.8 0c0-1.6-1-2.6-2.5-2.6h-1.3v5.2h1.3c1.5 0 2.5-1 2.5-2.6z"/></svg>
+          ORCID
+        </a>
         <a class="author-link" href="https://www.linkedin.com/in/md-kamruzzaman-65603a184" target="_blank">
           <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
           LinkedIn
@@ -1071,7 +1128,7 @@ footer a:hover { color: var(--green-light); }
     </div>
     <div class="author-main">
       <div class="author-name">Md Kamruzzaman</div>
-      <div class="author-affil">Department of Soil Science · Bangladesh Agricultural University (BAU) · Mymensingh, Bangladesh</div>
+      <div class="author-affil">MSc Ecotoxicology, Hungarian University of Agriculture and Life Sciences (MATE), Hungary · Model developed at the Department of Soil Science, BAU, Bangladesh</div>
       <p class="author-bio">Md Kamruzzaman is a soil scientist with research interests in soil organic carbon dynamics, nitrogen cycling, nutrient biogeochemistry, and heavy metal ecotoxicology in agricultural systems. He holds an MSc in Soil Science from Bangladesh Agricultural University and is currently completing a second MSc in Ecotoxicology at the Hungarian University of Agriculture and Life Sciences (MATE), Gödöllő, Hungary, under the Stipendium Hungaricum Scholarship. His research spans field-scale nutrient balance modelling, greenhouse gas emissions from agricultural soils, and enzyme biomarker responses to environmental contaminants.</p>
       <div class="author-attr-box">
         <strong>Methodology statement:</strong> The nutrient balance equations, crop-specific regression coefficients for leaching and gaseous losses, organic amendment nutrient content constants, moisture correction factors, and agronomic efficiency parameters in this calculator were independently developed by Md Kamruzzaman, based on field experimental data collected across three agroecological zones of Bangladesh (Bogura, Cumilla, Mymensingh). This open-source web implementation is the author's own version of that work, published here to make the methodology freely accessible to researchers and practitioners.
@@ -1249,7 +1306,7 @@ function sgn(v){return(v>=0?'+':'')+fmt(v);}
 
 function hideResults(){
   document.getElementById('placeholder').style.display='block';
-  ['balanceFlow','nutrientSection','recBlock'].forEach(id=>document.getElementById(id).classList.remove('visible'));
+  ['balanceFlow','nutrientSection','recBlock','chartBlock','actionBar'].forEach(id=>document.getElementById(id).classList.remove('visible'));
   document.getElementById('cropInfoBar').classList.remove('visible');
 }
 
@@ -1355,9 +1412,94 @@ function calculate(){
   document.getElementById('prevS').textContent=prev.S;
   setAdj('adjN',rN-prev.N);setAdj('adjP',rP-prev.P);
   setAdj('adjK',rK-prev.K);setAdj('adjS',rS-prev.S);
+  afterCalc({nIn,pIn,kIn,sIn,nUp,pUp,kUp,sUp,nLe,pLe,kLe,sLe,voT,n2T,nOut,pOut,kOut,sOut,nBal,pBal,kBal,sBal,rN,rP,rK,rS,prev});
+}
+
+
+/* ===== Website features (display only — the model equations above are unchanged) ===== */
+const INPUT_IDS=['sand','silt','rainfall','ph','mineralN','no3','totalN','organicC','grainYield','strawYield','nRate','pRate','kRate','sRate','cowDung','farmyard','poultry','residue'];
+let LAST=null;
+
+function runCalc(){
+  const msg=document.getElementById('inputMsg'); const errs=[];
+  if(gv('sand')+gv('silt')>100) errs.push('Sand + silt is more than 100%. Clay cannot be negative.');
+  const neg=INPUT_IDS.filter(id=>gv(id)<0);
+  if(neg.length) errs.push('Values cannot be negative.');
+  if(gv('ph')<3||gv('ph')>10) errs.push('pH should be between 3 and 10.');
+  if(errs.length){msg.textContent=errs.join(' ');msg.classList.add('show');hideResults();return;}
+  msg.classList.remove('show'); calculate();
+}
+
+function afterCalc(r){
+  LAST={crop:currentCrop,inputs:Object.fromEntries(INPUT_IDS.map(id=>[id,gv(id)])),r};
+  document.getElementById('actionBar').classList.add('visible');
+  document.getElementById('chartBlock').classList.add('visible');
+  drawChart(r);
+}
+
+function drawChart(r){
+  const rows=[
+    {n:'Nitrogen',  inp:r.nIn,parts:[r.nUp,r.nLe,r.voT,r.n2T]},
+    {n:'Phosphorus',inp:r.pIn,parts:[r.pUp,r.pLe,0,0]},
+    {n:'Potassium', inp:r.kIn,parts:[r.kUp,r.kLe,0,0]},
+    {n:'Sulfur',    inp:r.sIn,parts:[r.sUp,r.sLe,0,0]}];
+  const cols=['#4F6B3A','#3D6E8C','#C9A227','#9C4F22'];
+  const box=document.getElementById('chartBody'); const W=Math.max(300,Math.min(760,(box.clientWidth||640)-4)),L=W<480?78:96,R=16,rowH=46,top=8,plotW=W-L-R;
+  const max=Math.max(1,...rows.map(x=>Math.max(x.inp,x.parts.reduce((a,b)=>a+b,0))))*1.05;
+  const sx=v=>L+Math.max(0,v)/max*plotW;
+  const H=top+rows.length*rowH+18, step=max>250?100:max>100?50:max>40?20:10;
+  let grid='', g='';
+  for(let t=0;t<=max;t+=step){const x=sx(t); grid+=`<line x1="${x}" x2="${x}" y1="${top}" y2="${H-20}" stroke="#E8DFD3" stroke-width="1"/><text x="${x}" y="${H-6}" text-anchor="middle" font-family="DM Mono,monospace" font-size="9.5" fill="#8A7765">${t}</text>`;}
+  const names=['Crop uptake','Leaching','NH₃ volatilization','N₂O emission'];
+  rows.forEach((row,i)=>{
+    const y=top+i*rowH; let x0=L;
+    g+=`<text x="${L-10}" y="${y+19}" text-anchor="end" font-family="DM Sans,system-ui,sans-serif" font-size="12" fill="#3E2A1E">${row.n}</text>`;
+    row.parts.forEach((v,j)=>{ if(v<=0) return; const w=sx(v)-L;
+      g+=`<rect x="${x0}" y="${y+6}" width="${w}" height="20" fill="${cols[j]}"><title>${names[j]}: ${v.toFixed(2)} kg ha⁻¹</title></rect>`; x0+=w; });
+    const xi=sx(row.inp);
+    g+=`<line x1="${xi}" x2="${xi}" y1="${y+1}" y2="${y+31}" stroke="#22170F" stroke-width="2.5"><title>Total input: ${row.inp.toFixed(2)} kg ha⁻¹</title></line>`;
+    const out=row.parts.reduce((a,b)=>a+b,0), bal=row.inp-out;
+    g+=`<text x="${L}" y="${y+41}" font-family="DM Mono,monospace" font-size="10" fill="${bal>=0?'#4F6B3A':'#9b2226'}">${W<480?'in':'input'} ${row.inp.toFixed(1)} · ${W<480?'out':'output'} ${out.toFixed(1)} · ${W<480?'bal':'balance'} ${(bal>=0?'+':'')+bal.toFixed(1)}</text>`;
+  });
+  document.getElementById('chartBody').innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Nutrient output pathways compared with total input for N, P, K and S">${grid}${g}</svg>`;
+}
+
+let _rt; window.addEventListener('resize',()=>{clearTimeout(_rt);_rt=setTimeout(()=>{if(LAST&&document.getElementById('chartBlock').classList.contains('visible'))drawChart(LAST.r);},150);});
+
+function scenarioURL(){
+  const q=new URLSearchParams({c:currentCrop}); INPUT_IDS.forEach(id=>q.set(id,gv(id)));
+  return location.origin+location.pathname+'#'+q.toString();
+}
+function note(t){const n=document.getElementById('actNote');n.textContent=t;setTimeout(()=>{n.textContent='';},2500);}
+function copyScenarioLink(){
+  const url=scenarioURL(); history.replaceState(null,'',url);
+  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(url).then(()=>note('Link copied')).catch(()=>prompt('Copy this link:',url));}
+  else{prompt('Copy this link:',url);}
+}
+function downloadCSV(){
+  if(!LAST) return; const r=LAST.r, c=CROPS[LAST.crop];
+  const f=v=>v.toFixed(2);
+  const lines=[['Soil Nutrient Balance Calculator','https://kamruzzaman17.github.io/NBCtool/'],['Crop',c.name+' ('+c.scientific+')'],[]];
+  lines.push(['Input','Value']); INPUT_IDS.forEach(id=>lines.push([id,LAST.inputs[id]])); lines.push(['clay',document.getElementById('clay').value]); lines.push([]);
+  lines.push(['Nutrient','Total input','Crop uptake','Leaching','NH3 volatilization','N2O emission','Total output','Balance','New recommendation','Previous standard','Readjustment']);
+  const R=[['N',r.nIn,r.nUp,r.nLe,r.voT,r.n2T,r.nOut,r.nBal,r.rN,r.prev.N],['P',r.pIn,r.pUp,r.pLe,0,0,r.pOut,r.pBal,r.rP,r.prev.P],['K',r.kIn,r.kUp,r.kLe,0,0,r.kOut,r.kBal,r.rK,r.prev.K],['S',r.sIn,r.sUp,r.sLe,0,0,r.sOut,r.sBal,r.rS,r.prev.S]];
+  R.forEach(x=>lines.push([x[0],f(x[1]),f(x[2]),f(x[3]),f(x[4]),f(x[5]),f(x[6]),f(x[7]),f(Math.max(0,x[8])),x[9],f(x[8]-x[9])]));
+  lines.push([]); lines.push(['All values in kg ha-1. Model: Md Kamruzzaman, Department of Soil Science, BAU.']);
+  const csv=lines.map(l=>l.map(v=>/[",]/.test(String(v))?'"'+String(v).replace(/"/g,'""')+'"':v).join(',')).join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='nutrient-balance-'+LAST.crop+'.csv'; document.body.appendChild(a); a.click(); a.remove();
+}
+function loadScenarioFromURL(){
+  if(!location.hash) return; const q=new URLSearchParams(location.hash.slice(1)); const c=q.get('c');
+  if(!c||!CROPS[c]) return;
+  const btn=[...document.querySelectorAll('.crop-tab')].find(b=>b.getAttribute('onclick').includes("'"+c+"'"));
+  if(btn) selectCrop(c,btn);
+  INPUT_IDS.forEach(id=>{ if(q.has(id)&&!isNaN(parseFloat(q.get(id)))) sv(id,q.get(id)); });
+  updateClay(); runCalc();
 }
 
 updateClay();
+loadScenarioFromURL();
 </script>
 </body>
 </html>
