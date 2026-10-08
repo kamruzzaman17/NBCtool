@@ -12,7 +12,7 @@
 <meta property="og:image" content="https://lh3.googleusercontent.com/d/1ytfG-8_i_IFfsPWKe0G1wPF0Gqr1MD9c=w600">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2322170F'/><rect x='6' y='8' width='20' height='4' rx='1' fill='%234F6B3A'/><rect x='6' y='14' width='20' height='4' rx='1' fill='%239C4F22'/><rect x='6' y='20' width='20' height='4' rx='1' fill='%23C9A26B'/></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=DM+Sans:wght@300;400;500;600&family=Noto+Sans+Bengali:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -32,9 +32,10 @@
   --positive:   #4F6B3A;
   --negative:   #9b2226;
   --moss:       #4F6B3A;
-  --serif:      'Source Serif 4', Georgia, serif;
-  --sans:       'DM Sans', system-ui, sans-serif;
-  --mono:       'DM Mono', monospace;
+  --serif:      'Source Serif 4', 'Noto Sans Bengali', Georgia, serif;
+  --chart-ink:  #22170F;
+  --sans:       'DM Sans', 'Noto Sans Bengali', system-ui, sans-serif;
+  --mono:       'DM Mono', 'Noto Sans Bengali', monospace;
 }
 
 html { scroll-behavior: smooth; }
@@ -646,8 +647,84 @@ footer a:hover { color: var(--green-light); }
 .chart-legend span { display:inline-flex; align-items:center; gap:.4rem; }
 .chart-legend i { width: 11px; height: 11px; border-radius: 2px; display:inline-block; }
 
+
+/* ── NAV TOGGLES ── */
+.nav-right { display:flex; align-items:center; gap:.6rem; }
+.nav-toggle { font-family: var(--mono); font-size: 11px; height: 30px; min-width: 30px; padding: 0 .6rem;
+  border:1px solid var(--line); border-radius: 15px; background: transparent; color: var(--ink2);
+  cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition: all .2s; }
+.nav-toggle:hover { border-color: var(--green); color: var(--green); }
+.nav-toggle svg { width:15px; height:15px; stroke: currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+
+/* ── COMPARE ── */
+.compare-block { background: var(--white); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; display:none; }
+.compare-block.visible { display:block; }
+.cmp-table { width:100%; border-collapse: collapse; font-size: 12.5px; }
+.cmp-table th, .cmp-table td { padding: .55rem 1rem; border-bottom: 1px solid var(--line); text-align: right; }
+.cmp-table th:first-child, .cmp-table td:first-child { text-align:left; }
+.cmp-table thead th { font-family: var(--mono); font-size: 10px; letter-spacing:.06em; text-transform: uppercase; color: var(--faint); font-weight: 500; background: var(--bg); }
+.cmp-table td { font-family: var(--mono); color: var(--ink2); }
+.cmp-table td:first-child { font-family: var(--sans); }
+.cmp-table tr.cmp-group td { font-family: var(--mono); font-size: 9.5px; letter-spacing:.1em; text-transform: uppercase; color: var(--green); background: var(--bg); padding-top:.5rem; padding-bottom:.4rem; }
+.cmp-up { color: var(--positive) !important; } .cmp-down { color: var(--negative) !important; }
+.cmp-foot { padding: .65rem 1rem; font-family: var(--mono); font-size: 10.5px; color: var(--faint); display:flex; justify-content: space-between; gap:1rem; flex-wrap: wrap; align-items:center; }
+.cmp-wrap { overflow-x:auto; }
+
+/* ── CHART CLASSES ── */
+.ch-lbl { fill: var(--ink2); } .ch-axis { fill: var(--faint); } .ch-grid { stroke: var(--line); }
+.ch-in { stroke: var(--chart-ink); } .ch-pos { fill: var(--positive); } .ch-neg { fill: var(--negative); }
+.sw-input { background: var(--chart-ink) !important; }
+
+/* ── PRINT REPORT ── */
+#printReport { display:none; }
+@media print {
+  @page { margin: 14mm; }
+  body > *:not(#printReport) { display:none !important; }
+  body { background:#fff !important; }
+  #printReport { display:block; color:#111; font-family: 'DM Sans','Noto Sans Bengali',Arial,sans-serif; font-size: 11px; line-height:1.45; }
+  #printReport h1 { font-family: 'Source Serif 4','Noto Sans Bengali',Georgia,serif; font-size: 20px; margin-bottom: 2px; }
+  #printReport h2 { font-family: 'Source Serif 4','Noto Sans Bengali',Georgia,serif; font-size: 13px; margin: 14px 0 6px; border-bottom: 1px solid #999; padding-bottom: 2px; }
+  #printReport .pr-meta { color:#444; font-size:10px; }
+  #printReport table { width:100%; border-collapse: collapse; }
+  #printReport th, #printReport td { border:1px solid #bbb; padding: 3px 6px; text-align:right; }
+  #printReport th:first-child, #printReport td:first-child { text-align:left; }
+  #printReport th { background:#f1ece5; }
+  #printReport .pr-inputs { columns: 2; column-gap: 18px; }
+  #printReport .pr-inputs div { display:flex; justify-content:space-between; border-bottom: 1px dotted #ccc; padding: 2px 0; break-inside: avoid; }
+  #printReport .pr-chart svg { width:100%; height:auto; }
+  #printReport .pr-chart .ch-lbl{fill:#222} #printReport .pr-chart .ch-axis{fill:#666} #printReport .pr-chart .ch-grid{stroke:#ddd}
+  #printReport .pr-chart .ch-in{stroke:#111} #printReport .pr-chart .ch-pos{fill:#3d5a2c} #printReport .pr-chart .ch-neg{fill:#9b2226}
+  #printReport .pr-foot { word-break: break-all; margin-top: 14px; padding-top: 6px; border-top: 1px solid #999; font-size: 9.5px; color:#444; }
+}
+
+/* ── DARK MODE ── */
+html.dark {
+  --bg:#14100C; --white:#1C1611; --line:#3A2E24; --ink2:#E8DCCD; --mid:#C2B09C; --faint:#9A8878;
+  --green:#E0A458; --green-pale:#2A2019; --green-dark:#EDB872; --positive:#A9C08F; --negative:#F08A8A;
+  --chart-ink:#F1E8DD;
+}
+html.dark body, html.dark .field-input, html.dark .flow-nutrient-name, html.dark .nc-name, html.dark .nc-total-lbl,
+html.dark .nc-total-val, html.dark .rec-section-title, html.dark .rc-val, html.dark .method-body strong { color:#F1E8DD; }
+html.dark .hero-title, html.dark .panel-head, html.dark .panel-head-title, html.dark .block-head-title, html.dark .author-name { color:#F1E8DD; }
+html.dark nav { background: rgba(20,16,12,.95); }
+html.dark .attr-bar { background:#2A1D13; }
+html.dark .nav-tool-badge { border-color:#3A2E24; }
+html.dark .nav-brand { color: #EDB872; }
+html.dark .field-input { background: #14100C; }
+html.dark .field-input:focus { background: #0E0A07; }
+html.dark .field-input.computed { background: #2A2019; color:#EDB872; }
+html.dark .calc-btn { background:#E0A458; color:#14100C; }
+html.dark .calc-btn:hover { background:#EDB872; }
+html.dark .flow-balance.pos, html.dark .nc-balance.pos { background: rgba(169,192,143,.1); border-color: rgba(169,192,143,.3); }
+html.dark .flow-balance.neg, html.dark .nc-balance.neg, html.dark .input-msg { background: rgba(240,138,138,.08); border-color: rgba(240,138,138,.3); }
+html.dark .crop-info-bar { border-color: #3A2E24; }
+html.dark .crop-nav-wrap { box-shadow: none; }
+html.dark .placeholder-icon { opacity:.4; }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 960px) {
+  .nav-links { display:none; }
+  nav { padding: 0 1rem; }
   .main-wrap { grid-template-columns: 1fr; padding: 1.5rem; }
   .input-panel { position: static; }
   .nutrient-cols,
@@ -673,7 +750,11 @@ footer a:hover { color: var(--green-light); }
     <li><a href="#author">About</a></li>
     <li><a href="https://kamruzzaman17.github.io/kamruzzaman/" target="_blank">Portfolio ↗</a></li>
   </ul>
-  <span class="nav-tool-badge">v3.0 · BAU Soil Science</span>
+  <div class="nav-right">
+    <span class="nav-tool-badge">v3.0 · BAU Soil Science</span>
+    <button class="nav-toggle" id="langToggle" onclick="toggleLang()" aria-label="Switch language">বাংলা</button>
+    <button class="nav-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode"></button>
+  </div>
 </nav>
 
 <!-- ── HERO ── -->
@@ -682,7 +763,7 @@ footer a:hover { color: var(--green-light); }
     <div>
       <div class="hero-tag">Department of Soil Science · Bangladesh Agricultural University · Mymensingh</div>
       <h1 class="hero-title">Soil Nutrient<br><em>Balance Calculator</em></h1>
-      <p class="hero-sub">A field-validated regression model estimating nitrogen, phosphorus, potassium, and sulfur balances for major Bangladesh cropping systems, with adjusted zero-depletion fertilizer recommendations.</p>
+      <p class="hero-sub" data-i18n-html="herosub">A field-validated regression model estimating nitrogen, phosphorus, potassium, and sulfur balances for major Bangladesh cropping systems, with adjusted zero-depletion fertilizer recommendations.</p>
       <div class="hero-pills">
         <span class="hero-pill">Nitrogen · Phosphorus · Potassium · Sulfur</span>
         <span class="hero-pill">5 Crop Systems</span>
@@ -866,7 +947,7 @@ footer a:hover { color: var(--green-light); }
 
     <div class="placeholder-block" id="placeholder">
       <div class="placeholder-icon">⚖</div>
-      <p>Select a crop above, enter field parameters, and press <strong>Calculate</strong> to generate nutrient balance estimates.</p>
+      <p data-i18n-html="placeholder">Select a crop above, enter field parameters, and press <strong>Calculate</strong> to generate nutrient balance estimates.</p>
     </div>
 
     <!-- Crop info -->
@@ -880,7 +961,19 @@ footer a:hover { color: var(--green-light); }
     <div class="action-bar" id="actionBar">
       <button class="act-btn" onclick="copyScenarioLink()">Copy link to this scenario</button>
       <button class="act-btn" onclick="downloadCSV()">Download results (CSV)</button>
+      <button class="act-btn" onclick="printReport()">Print / save as PDF</button>
+      <button class="act-btn" onclick="pinScenario()">Pin as scenario A</button>
       <span class="act-note" id="actNote" aria-live="polite"></span>
+    </div>
+
+    <!-- Scenario comparison -->
+    <div class="compare-block" id="compareBlock">
+      <div class="block-head">
+        <span class="block-head-title">Scenario comparison</span>
+        <span class="block-head-sub">Pinned scenario A vs current · kg ha⁻¹</span>
+      </div>
+      <div class="cmp-wrap"><table class="cmp-table" id="cmpTable"></table></div>
+      <div class="cmp-foot"><span id="cmpNote"></span><button class="act-btn" onclick="clearPin()">Clear scenario A</button></div>
     </div>
 
     <!-- Balance flow summary -->
@@ -945,7 +1038,7 @@ footer a:hover { color: var(--green-light); }
         <span><i style="background:#3D6E8C"></i>Leaching</span>
         <span><i style="background:#C9A227"></i>NH₃ volatilization</span>
         <span><i style="background:#9C4F22"></i>N₂O emission</span>
-        <span><i style="background:#22170F;width:3px"></i>Total input</span>
+        <span><i class="sw-input" style="width:3px"></i>Total input</span>
       </div>
     </div>
 
@@ -1023,7 +1116,7 @@ footer a:hover { color: var(--green-light); }
           </div>
         </div>
       </div>
-      <div class="ns-footer">All values in kg ha⁻¹ · Positive balance = surplus · Negative balance = soil depletion requiring corrective fertilization</div>
+      <div class="ns-footer" data-i18n-html="nsfoot">All values in kg ha⁻¹ · Positive balance = surplus · Negative balance = soil depletion requiring corrective fertilization</div>
     </div>
 
     <!-- Recommendations - 3 clearly separated sections -->
@@ -1032,7 +1125,7 @@ footer a:hover { color: var(--green-light); }
       <div class="rec-section">
         <div class="rec-section-head">
           <span class="rec-section-title">① New recommendation</span>
-          <span class="rec-section-desc">Dose required to achieve zero nutrient balance under current field conditions</span>
+          <span class="rec-section-desc" data-i18n-html="rec1">Dose required to achieve zero nutrient balance under current field conditions</span>
         </div>
         <div class="rec-grid">
           <div class="rec-cell"><div class="rc-lbl">Nitrogen</div><div class="rc-val" id="recN">—</div><div class="rc-unit">kg ha⁻¹</div></div>
@@ -1045,7 +1138,7 @@ footer a:hover { color: var(--green-light); }
       <div class="rec-section">
         <div class="rec-section-head">
           <span class="rec-section-title">② Previous standard recommendation</span>
-          <span class="rec-section-desc">Crop-specific standard fertilizer dose from national guidelines</span>
+          <span class="rec-section-desc" data-i18n-html="rec2">Crop-specific standard fertilizer dose from national guidelines</span>
         </div>
         <div class="rec-grid">
           <div class="rec-cell"><div class="rc-lbl">Nitrogen</div><div class="rc-val" style="font-size:1.05rem" id="prevN">—</div><div class="rc-unit">kg ha⁻¹</div></div>
@@ -1058,7 +1151,7 @@ footer a:hover { color: var(--green-light); }
       <div class="rec-section">
         <div class="rec-section-head">
           <span class="rec-section-title">③ Readjustment</span>
-          <span class="rec-section-desc">Difference between new recommendation and previous standard (① minus ②) — positive = increase needed, negative = reduction possible</span>
+          <span class="rec-section-desc" data-i18n-html="rec3">Difference between new recommendation and previous standard (① minus ②) — positive = increase needed, negative = reduction possible</span>
         </div>
         <div class="rec-grid">
           <div class="rec-cell"><div class="rc-lbl">Nitrogen</div><div class="rc-val" style="font-size:1.05rem" id="adjN">—</div><div class="rc-unit">kg ha⁻¹</div></div>
@@ -1142,6 +1235,8 @@ footer a:hover { color: var(--green-light); }
   <div>Soil Nutrient Balance Calculator v3.0 · Department of Soil Science, BAU · 2024</div>
   <div style="margin-top:0.4rem">Equations &amp; methodology: <a href="https://kamruzzaman17.github.io/kamruzzaman/" target="_blank">Md Kamruzzaman</a> · Open-source implementation</div>
 </footer>
+
+<div id="printReport" aria-hidden="true"></div>
 
 <script>
 const CROPS = {
@@ -1422,10 +1517,10 @@ let LAST=null;
 
 function runCalc(){
   const msg=document.getElementById('inputMsg'); const errs=[];
-  if(gv('sand')+gv('silt')>100) errs.push('Sand + silt is more than 100%. Clay cannot be negative.');
+  if(gv('sand')+gv('silt')>100) errs.push(T('msg_texture'));
   const neg=INPUT_IDS.filter(id=>gv(id)<0);
-  if(neg.length) errs.push('Values cannot be negative.');
-  if(gv('ph')<3||gv('ph')>10) errs.push('pH should be between 3 and 10.');
+  if(neg.length) errs.push(T('msg_neg'));
+  if(gv('ph')<3||gv('ph')>10) errs.push(T('msg_ph'));
   if(errs.length){msg.textContent=errs.join(' ');msg.classList.add('show');hideResults();return;}
   msg.classList.remove('show'); calculate();
 }
@@ -1435,34 +1530,39 @@ function afterCalc(r){
   document.getElementById('actionBar').classList.add('visible');
   document.getElementById('chartBlock').classList.add('visible');
   drawChart(r);
+  renderCompare();
+  applyLang();
 }
 
-function drawChart(r){
+function chartSVG(r,Wforce){
   const rows=[
-    {n:'Nitrogen',  inp:r.nIn,parts:[r.nUp,r.nLe,r.voT,r.n2T]},
-    {n:'Phosphorus',inp:r.pIn,parts:[r.pUp,r.pLe,0,0]},
-    {n:'Potassium', inp:r.kIn,parts:[r.kUp,r.kLe,0,0]},
-    {n:'Sulfur',    inp:r.sIn,parts:[r.sUp,r.sLe,0,0]}];
+    {n:T('Nitrogen'),  inp:r.nIn,parts:[r.nUp,r.nLe,r.voT,r.n2T]},
+    {n:T('Phosphorus'),inp:r.pIn,parts:[r.pUp,r.pLe,0,0]},
+    {n:T('Potassium'), inp:r.kIn,parts:[r.kUp,r.kLe,0,0]},
+    {n:T('Sulfur'),    inp:r.sIn,parts:[r.sUp,r.sLe,0,0]}];
   const cols=['#4F6B3A','#3D6E8C','#C9A227','#9C4F22'];
-  const box=document.getElementById('chartBody'); const W=Math.max(300,Math.min(760,(box.clientWidth||640)-4)),L=W<480?78:96,R=16,rowH=46,top=8,plotW=W-L-R;
+  const box=document.getElementById('chartBody');
+  const W=Wforce||Math.max(300,Math.min(760,(box.clientWidth||640)-4)),L=W<480?78:96,R=16,rowH=46,top=8,plotW=W-L-R;
   const max=Math.max(1,...rows.map(x=>Math.max(x.inp,x.parts.reduce((a,b)=>a+b,0))))*1.05;
   const sx=v=>L+Math.max(0,v)/max*plotW;
   const H=top+rows.length*rowH+18, step=max>250?100:max>100?50:max>40?20:10;
+  const sm=W<480;
   let grid='', g='';
-  for(let t=0;t<=max;t+=step){const x=sx(t); grid+=`<line x1="${x}" x2="${x}" y1="${top}" y2="${H-20}" stroke="#E8DFD3" stroke-width="1"/><text x="${x}" y="${H-6}" text-anchor="middle" font-family="DM Mono,monospace" font-size="9.5" fill="#8A7765">${t}</text>`;}
-  const names=['Crop uptake','Leaching','NH₃ volatilization','N₂O emission'];
+  for(let t=0;t<=max;t+=step){const x=sx(t); grid+=`<line class="ch-grid" x1="${x}" x2="${x}" y1="${top}" y2="${H-20}" stroke-width="1"/><text class="ch-axis" x="${x}" y="${H-6}" text-anchor="middle" font-family="DM Mono,monospace" font-size="9.5">${t}</text>`;}
+  const names=[T('Crop uptake'),T('Leaching'),T('NH₃ volatilization'),T('N₂O emission')];
   rows.forEach((row,i)=>{
     const y=top+i*rowH; let x0=L;
-    g+=`<text x="${L-10}" y="${y+19}" text-anchor="end" font-family="DM Sans,system-ui,sans-serif" font-size="12" fill="#3E2A1E">${row.n}</text>`;
+    g+=`<text class="ch-lbl" x="${L-10}" y="${y+19}" text-anchor="end" font-family="DM Sans,Noto Sans Bengali,system-ui,sans-serif" font-size="12">${row.n}</text>`;
     row.parts.forEach((v,j)=>{ if(v<=0) return; const w=sx(v)-L;
       g+=`<rect x="${x0}" y="${y+6}" width="${w}" height="20" fill="${cols[j]}"><title>${names[j]}: ${v.toFixed(2)} kg ha⁻¹</title></rect>`; x0+=w; });
     const xi=sx(row.inp);
-    g+=`<line x1="${xi}" x2="${xi}" y1="${y+1}" y2="${y+31}" stroke="#22170F" stroke-width="2.5"><title>Total input: ${row.inp.toFixed(2)} kg ha⁻¹</title></line>`;
+    g+=`<line class="ch-in" x1="${xi}" x2="${xi}" y1="${y+1}" y2="${y+31}" stroke-width="2.5"><title>${T('Total input')}: ${row.inp.toFixed(2)} kg ha⁻¹</title></line>`;
     const out=row.parts.reduce((a,b)=>a+b,0), bal=row.inp-out;
-    g+=`<text x="${L}" y="${y+41}" font-family="DM Mono,monospace" font-size="10" fill="${bal>=0?'#4F6B3A':'#9b2226'}">${W<480?'in':'input'} ${row.inp.toFixed(1)} · ${W<480?'out':'output'} ${out.toFixed(1)} · ${W<480?'bal':'balance'} ${(bal>=0?'+':'')+bal.toFixed(1)}</text>`;
+    g+=`<text class="${bal>=0?'ch-pos':'ch-neg'}" x="${L}" y="${y+41}" font-family="DM Mono,Noto Sans Bengali,monospace" font-size="10">${T(sm?'in':'input')} ${row.inp.toFixed(1)} · ${T(sm?'out':'output')} ${out.toFixed(1)} · ${T(sm?'bal':'balance')} ${(bal>=0?'+':'')+bal.toFixed(1)}</text>`;
   });
-  document.getElementById('chartBody').innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Nutrient output pathways compared with total input for N, P, K and S">${grid}${g}</svg>`;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Nutrient output pathways compared with total input for N, P, K and S">${grid}${g}</svg>`;
 }
+function drawChart(r){ document.getElementById('chartBody').innerHTML=chartSVG(r); }
 
 let _rt; window.addEventListener('resize',()=>{clearTimeout(_rt);_rt=setTimeout(()=>{if(LAST&&document.getElementById('chartBlock').classList.contains('visible'))drawChart(LAST.r);},150);});
 
@@ -1473,8 +1573,8 @@ function scenarioURL(){
 function note(t){const n=document.getElementById('actNote');n.textContent=t;setTimeout(()=>{n.textContent='';},2500);}
 function copyScenarioLink(){
   const url=scenarioURL(); history.replaceState(null,'',url);
-  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(url).then(()=>note('Link copied')).catch(()=>prompt('Copy this link:',url));}
-  else{prompt('Copy this link:',url);}
+  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(url).then(()=>note(T('Link copied'))).catch(()=>prompt(T('Copy this link:'),url));}
+  else{prompt(T('Copy this link:'),url);}
 }
 function downloadCSV(){
   if(!LAST) return; const r=LAST.r, c=CROPS[LAST.crop];
@@ -1497,6 +1597,163 @@ function loadScenarioFromURL(){
   INPUT_IDS.forEach(id=>{ if(q.has(id)&&!isNaN(parseFloat(q.get(id)))) sv(id,q.get(id)); });
   updateClay(); runCalc();
 }
+
+/* ===== Language (interface labels only; numbers are not affected) ===== */
+const BN={
+ 'Soil Nutrient Balance Calculator':'মাটির পুষ্টি ভারসাম্য ক্যালকুলেটর','Calculator':'ক্যালকুলেটর','Methodology':'পদ্ধতি','About':'পরিচিতি','Portfolio ↗':'পোর্টফোলিও ↗',
+ 'Department of Soil Science · Bangladesh Agricultural University · Mymensingh':'মৃত্তিকা বিজ্ঞান বিভাগ · বাংলাদেশ কৃষি বিশ্ববিদ্যালয় · ময়মনসিংহ',
+ 'Soil Nutrient':'মাটির পুষ্টি','Balance Calculator':'ভারসাম্য ক্যালকুলেটর',
+ 'Nitrogen · Phosphorus · Potassium · Sulfur':'নাইট্রোজেন · ফসফরাস · পটাশিয়াম · সালফার','5 Crop Systems':'৫টি ফসল পদ্ধতি','Validated · 3 Agroecological Zones':'যাচাইকৃত · ৩টি কৃষি-পরিবেশ অঞ্চল',
+ 'Crop systems':'ফসল পদ্ধতি','Nutrients modelled':'পুষ্টি উপাদান','AEZs validated':'যাচাইকৃত অঞ্চল',
+ 'Potato':'আলু','Boro Rice':'বোরো ধান','T. Aus Rice':'টি. আউশ ধান','T. Aman Rice':'টি. আমন ধান','Maize':'ভুট্টা',
+ 'Rabi · Oct – Mar':'রবি · অক্টোবর – মার্চ','Winter · Nov – May':'শীতকাল · নভেম্বর – মে','Pre-monsoon · Mar – Jul':'প্রাক-বর্ষা · মার্চ – জুলাই','Kharif · Jun – Dec':'খরিফ · জুন – ডিসেম্বর','Rabi / Kharif':'রবি / খরিফ',
+ 'Field Parameters':'মাঠের তথ্য','Enter measured or estimated values':'পরিমাপকৃত বা আনুমানিক মান দিন',
+ 'Soil texture':'মাটির বুনট','Sand':'বালি','Silt':'পলি','Clay':'কর্দম','% (auto)':'% (স্বয়ংক্রিয়)',
+ 'Soil properties & climate':'মাটির বৈশিষ্ট্য ও জলবায়ু','Rainfall':'বৃষ্টিপাত','Mineral N':'খনিজ নাইট্রোজেন','Total N':'মোট নাইট্রোজেন','Organic C':'জৈব কার্বন',
+ 'Yield':'ফলন','Tuber yield':'কন্দের ফলন','Haulm yield':'আলু গাছের ফলন','Grain yield':'দানার ফলন','Straw yield':'খড়ের ফলন',
+ 'Applied nutrient rates':'প্রয়োগকৃত পুষ্টির মাত্রা','Nitrogen':'নাইট্রোজেন','Phosphorus':'ফসফরাস','Potassium':'পটাশিয়াম','Sulfur':'সালফার',
+ 'Organic amendments':'জৈব সার','Cow dung':'গোবর','Farmyard manure':'খামারজাত সার','Poultry manure':'মুরগির বিষ্ঠা',
+ 'Crop residue':'ফসলের অবশিষ্টাংশ','Residue retained':'রেখে দেওয়া অবশিষ্টাংশ','inch':'ইঞ্চি',
+ 'Calculate nutrient balance →':'পুষ্টি ভারসাম্য হিসাব করুন →',
+ 'Crop':'ফসল','Season':'মৌসুম','Period':'সময়কাল',
+ 'Rabi (dry season)':'রবি (শুষ্ক মৌসুম)','Winter irrigated rice':'শীতকালীন সেচনির্ভর ধান','Pre-monsoon transplanted rice':'প্রাক-বর্ষা রোপা ধান','Kharif monsoon transplanted rice':'খরিফ বর্ষাকালীন রোপা ধান','Rabi / Kharif (dual season)':'রবি / খরিফ (দুই মৌসুম)',
+ 'October – March':'অক্টোবর – মার্চ','November – May':'নভেম্বর – মে','March – July':'মার্চ – জুলাই','June – December':'জুন – ডিসেম্বর','Variable':'পরিবর্তনশীল',
+ 'Nutrient balance summary':'পুষ্টি ভারসাম্যের সারসংক্ষেপ','Input − Output = Balance · kg ha⁻¹':'যোগান − অপসারণ = ভারসাম্য · কেজি/হেক্টর',
+ 'Total input':'মোট যোগান','Total output':'মোট অপসারণ','Balance':'ভারসাম্য',
+ 'Where the nutrients go':'পুষ্টি উপাদান কোথায় যায়','Output pathways vs total input · kg ha⁻¹':'অপসারণের পথ বনাম মোট যোগান · কেজি/হেক্টর',
+ 'Crop uptake':'ফসলের গ্রহণ','Leaching':'চুঁইয়ে ক্ষয়','NH₃ volatilization':'NH₃ উদ্বায়ীকরণ','N₂O emission':'N₂O নির্গমন',
+ 'Detailed pathway breakdown':'পথভিত্তিক বিস্তারিত হিসাব','All loss pathways · kg ha⁻¹':'সব ক্ষয়ের পথ · কেজি/হেক্টর',
+ 'Input':'যোগান','Output pathways':'অপসারণের পথ','Applied + organic':'প্রয়োগকৃত + জৈব','Volatilization (NH₃)':'উদ্বায়ীকরণ (NH₃)',
+ '① New recommendation':'① নতুন সুপারিশ','② Previous standard recommendation':'② পূর্বের প্রচলিত সুপারিশ','③ Readjustment':'③ পুনঃসমন্বয়',
+ 'Model methodology & scientific basis':'মডেলের পদ্ধতি ও বৈজ্ঞানিক ভিত্তি (ইংরেজিতে)',
+ 'Copy link to this scenario':'এই হিসাবের লিংক কপি করুন','Download results (CSV)':'ফলাফল ডাউনলোড (CSV)','Print / save as PDF':'প্রিন্ট / PDF সংরক্ষণ','Pin as scenario A':'পরিস্থিতি A হিসেবে রাখুন',
+ 'Scenario comparison':'পরিস্থিতির তুলনা','Pinned scenario A vs current · kg ha⁻¹':'সংরক্ষিত পরিস্থিতি A বনাম বর্তমান · কেজি/হেক্টর','Clear scenario A':'পরিস্থিতি A মুছুন',
+ 'Link copied':'লিংক কপি হয়েছে','Copy this link:':'এই লিংকটি কপি করুন:',
+ 'input':'যোগান','output':'অপসারণ','balance':'ভারসাম্য','in':'যোগান','out':'অপসারণ','bal':'ভারসাম্য',
+ 'msg_texture':'বালি + পলি ১০০% এর বেশি। কর্দম ঋণাত্মক হতে পারে না।','msg_neg':'কোনো মান ঋণাত্মক হতে পারে না।','msg_ph':'pH ৩ থেকে ১০ এর মধ্যে হতে হবে।',
+ 'cmp_balance':'ভারসাম্য','cmp_rec':'নতুন সুপারিশ','cmp_loss':'নাইট্রোজেন ক্ষয় (চুঁইয়ে + NH₃ + N₂O)','cmp_a':'পরিস্থিতি A','cmp_now':'বর্তমান','cmp_diff':'পার্থক্য',
+ 'cmp_same':'একই ফসল · পার্থক্য = বর্তমান − A','cmp_crop':'সতর্কতা: দুটি পরিস্থিতিতে ভিন্ন ফসল',
+ 'pr_title':'মাটির পুষ্টি ভারসাম্য প্রতিবেদন','pr_inputs':'মাঠের তথ্য','pr_bal':'পুষ্টি ভারসাম্য (কেজি/হেক্টর)','pr_rec':'সার সুপারিশ (কেজি/হেক্টর)','pr_chart':'পুষ্টি উপাদান কোথায় যায়',
+ 'pr_new':'নতুন সুপারিশ','pr_prev':'পূর্বের প্রচলিত','pr_adj':'পুনঃসমন্বয়','pr_nut':'পুষ্টি উপাদান','pr_date':'তারিখ','pr_link':'এই হিসাবের লিংক',
+ 'pr_credit':'মডেল ও সমীকরণ: মো. কামরুজ্জামান, মৃত্তিকা বিজ্ঞান বিভাগ, বাংলাদেশ কৃষি বিশ্ববিদ্যালয়। বাংলাদেশের তিনটি কৃষি-পরিবেশ অঞ্চলে যাচাইকৃত।'
+};
+const BNHTML={
+ placeholder:'উপরে একটি ফসল বেছে নিন, মাঠের তথ্য দিন, তারপর <strong>হিসাব করুন</strong> চাপুন।',
+ nsfoot:'সব মান কেজি/হেক্টর · ধনাত্মক ভারসাম্য = উদ্বৃত্ত · ঋণাত্মক ভারসাম্য = মাটির পুষ্টি ক্ষয়, যা সংশোধনমূলক সার প্রয়োগ দাবি করে',
+ rec1:'বর্তমান মাঠের অবস্থায় পুষ্টি ভারসাম্য শূন্যে আনতে প্রয়োজনীয় মাত্রা',
+ rec2:'জাতীয় নির্দেশিকা অনুযায়ী ফসলভিত্তিক প্রচলিত সারের মাত্রা',
+ rec3:'নতুন সুপারিশ ও পূর্বের প্রচলিত মাত্রার পার্থক্য (① বিয়োগ ②) — ধনাত্মক = বাড়াতে হবে, ঋণাত্মক = কমানো যাবে',
+ herosub:'মাঠে যাচাইকৃত একটি রিগ্রেশন মডেল, যা বাংলাদেশের প্রধান ফসল পদ্ধতিতে নাইট্রোজেন, ফসফরাস, পটাশিয়াম ও সালফারের ভারসাম্য হিসাব করে এবং মাটির পুষ্টি ক্ষয় এড়াতে সমন্বিত সার সুপারিশ দেয়।'
+};
+const EN_TEXT={'msg_texture':'Sand + silt is more than 100%. Clay cannot be negative.','msg_neg':'Values cannot be negative.','msg_ph':'pH should be between 3 and 10.',
+ 'cmp_balance':'Balance','cmp_rec':'New recommendation','cmp_loss':'N losses (leaching + NH₃ + N₂O)','cmp_a':'Scenario A','cmp_now':'Current','cmp_diff':'Difference',
+ 'cmp_same':'Same crop · difference = current − A','cmp_crop':'Note: the two scenarios use different crops',
+ 'pr_title':'Soil Nutrient Balance Report','pr_inputs':'Field parameters','pr_bal':'Nutrient balance (kg ha⁻¹)','pr_rec':'Fertilizer recommendation (kg ha⁻¹)','pr_chart':'Where the nutrients go',
+ 'pr_new':'New recommendation','pr_prev':'Previous standard','pr_adj':'Readjustment','pr_nut':'Nutrient','pr_date':'Date','pr_link':'Scenario link',
+ 'pr_credit':'Model and equations: Md Kamruzzaman, Department of Soil Science, Bangladesh Agricultural University. Validated in three agroecological zones of Bangladesh.'};
+let LANG='en';
+function T(k){ return LANG==='bn' ? (BN[k]||EN_TEXT[k]||k) : (EN_TEXT[k]||k); }
+const LANG_SKIP='.method-body, .author-wrap, .attr-bar, footer, script, style, #printReport, .field-input, .tab-scientific, svg, .cib-val';
+const _orig=new WeakMap(), _origHTML=new WeakMap();
+function applyLang(){
+  document.documentElement.lang = LANG==='bn'?'bn':'en';
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{
+    if(!_origHTML.has(el)) _origHTML.set(el,el.innerHTML);
+    el.innerHTML = LANG==='bn' ? BNHTML[el.dataset.i18nHtml] : _origHTML.get(el);
+  });
+  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:n=>{
+    const p=n.parentElement; if(!p||p.closest(LANG_SKIP)||p.closest('[data-i18n-html]')) return NodeFilter.FILTER_REJECT;
+    return n.nodeValue.trim()?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT; }});
+  const nodes=[]; while(walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(n=>{
+    if(!_orig.has(n)) _orig.set(n,n.nodeValue);
+    const o=_orig.get(n), key=o.trim();
+    if(LANG==='bn' && BN[key]) n.nodeValue=o.replace(key,BN[key]); else n.nodeValue=o;
+  });
+  document.getElementById('langToggle').textContent = LANG==='bn'?'English':'বাংলা';
+  if(LAST){ const c=CROPS[LAST.crop];
+    document.getElementById('cibName').textContent=T(c.name)+' ('+c.scientific+')';
+    document.getElementById('cibSeason').textContent=T(c.season);
+    document.getElementById('cibPeriod').textContent=T(c.period); }
+}
+function toggleLang(){
+  LANG = LANG==='bn'?'en':'bn';
+  try{localStorage.setItem('nbc-lang',LANG);}catch(e){}
+  applyLang();
+  if(LAST && document.getElementById('chartBlock').classList.contains('visible')){ drawChart(LAST.r); renderCompare(); }
+}
+
+/* ===== Dark mode ===== */
+const ICON_MOON='<svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+const ICON_SUN='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+function setTheme(dark){
+  document.documentElement.classList.toggle('dark',dark);
+  document.getElementById('themeToggle').innerHTML = dark?ICON_SUN:ICON_MOON;
+}
+function toggleTheme(){
+  const dark=!document.documentElement.classList.contains('dark'); setTheme(dark);
+  try{localStorage.setItem('nbc-theme',dark?'dark':'light');}catch(e){}
+}
+
+/* ===== Scenario comparison ===== */
+let PIN=null;
+function pinScenario(){
+  if(!LAST) return; PIN=JSON.parse(JSON.stringify(LAST)); renderCompare();
+  document.getElementById('compareBlock').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function clearPin(){ PIN=null; document.getElementById('compareBlock').classList.remove('visible'); }
+function renderCompare(){
+  const blk=document.getElementById('compareBlock');
+  if(!PIN||!LAST){ blk.classList.remove('visible'); return; }
+  const a=PIN.r, c=LAST.r, f=v=>v.toFixed(2);
+  const d=(x,y,goodUp)=>{const v=y-x; const cls=Math.abs(v)<0.005?'':((v>0)===goodUp?'cmp-up':'cmp-down'); return `<td class="${cls}">${(v>=0?'+':'')+f(v)}</td>`;};
+  const nut=['Nitrogen','Phosphorus','Potassium','Sulfur'], kb=['nBal','pBal','kBal','sBal'], kr=['rN','rP','rK','rS'];
+  let h=`<thead><tr><th></th><th>${T('cmp_a')} · ${T(CROPS[PIN.crop].name)}</th><th>${T('cmp_now')} · ${T(CROPS[LAST.crop].name)}</th><th>${T('cmp_diff')}</th></tr></thead><tbody>`;
+  h+=`<tr class="cmp-group"><td colspan="4">${T('cmp_balance')}</td></tr>`;
+  nut.forEach((n,i)=>{ h+=`<tr><td>${T(n)}</td><td>${f(a[kb[i]])}</td><td>${f(c[kb[i]])}</td>${d(a[kb[i]],c[kb[i]],true)}</tr>`; });
+  h+=`<tr class="cmp-group"><td colspan="4">${T('cmp_rec')}</td></tr>`;
+  nut.forEach((n,i)=>{ const x=Math.max(0,a[kr[i]]),y=Math.max(0,c[kr[i]]); h+=`<tr><td>${T(n)}</td><td>${f(x)}</td><td>${f(y)}</td>${d(x,y,false)}</tr>`; });
+  const la=a.nLe+a.voT+a.n2T, lc=c.nLe+c.voT+c.n2T;
+  h+=`<tr class="cmp-group"><td colspan="4">${T('cmp_loss')}</td></tr><tr><td>${T('Nitrogen')}</td><td>${f(la)}</td><td>${f(lc)}</td>${d(la,lc,false)}</tr></tbody>`;
+  document.getElementById('cmpTable').innerHTML=h;
+  document.getElementById('cmpNote').textContent = PIN.crop===LAST.crop ? T('cmp_same') : T('cmp_crop');
+  blk.classList.add('visible');
+}
+
+/* ===== Printable report ===== */
+function buildReport(){
+  if(!LAST) return; const r=LAST.r, c=CROPS[LAST.crop], f=v=>v.toFixed(2), i=LAST.inputs;
+  const fields=[['Sand',i.sand,'%'],['Silt',i.silt,'%'],['Clay',document.getElementById('clay').value,'%'],['Rainfall',i.rainfall,'mm'],['pH',i.ph,''],
+    ['Mineral N',i.mineralN,'mg kg⁻¹'],['NO₃⁻',i.no3,'mg kg⁻¹'],['Total N',i.totalN,'%'],['Organic C',i.organicC,'%'],
+    [LAST.crop==='potato'?'Tuber yield':'Grain yield',i.grainYield,'t ha⁻¹'],[LAST.crop==='potato'?'Haulm yield':'Straw yield',i.strawYield,'t ha⁻¹'],
+    ['Nitrogen',i.nRate,'kg ha⁻¹'],['Phosphorus',i.pRate,'kg ha⁻¹'],['Potassium',i.kRate,'kg ha⁻¹'],['Sulfur',i.sRate,'kg ha⁻¹'],
+    ['Cow dung',i.cowDung,'t ha⁻¹'],['Farmyard manure',i.farmyard,'t ha⁻¹'],['Poultry manure',i.poultry,'t ha⁻¹'],['Residue retained',i.residue,T('inch')]];
+  const rows=[['Nitrogen',r.nIn,r.nUp,r.nLe,r.voT,r.n2T,r.nOut,r.nBal],['Phosphorus',r.pIn,r.pUp,r.pLe,null,null,r.pOut,r.pBal],['Potassium',r.kIn,r.kUp,r.kLe,null,null,r.kOut,r.kBal],['Sulfur',r.sIn,r.sUp,r.sLe,null,null,r.sOut,r.sBal]];
+  const recs=[['Nitrogen',r.rN,r.prev.N],['Phosphorus',r.rP,r.prev.P],['Potassium',r.rK,r.prev.K],['Sulfur',r.rS,r.prev.S]];
+  const date=new Date().toLocaleDateString(LANG==='bn'?'bn-BD':'en-GB',{day:'numeric',month:'long',year:'numeric'});
+  let h=`<h1>${T('pr_title')}</h1><div class="pr-meta">${T('Crop')}: ${T(c.name)} (${c.scientific}) · ${T('Season')}: ${T(c.season)} · ${T('pr_date')}: ${date}</div>`;
+  h+=`<h2>${T('pr_inputs')}</h2><div class="pr-inputs">${fields.map(x=>`<div><span>${T(x[0])}</span><span>${x[1]} ${x[2]}</span></div>`).join('')}</div>`;
+  h+=`<h2>${T('pr_bal')}</h2><table><tr><th>${T('pr_nut')}</th><th>${T('Total input')}</th><th>${T('Crop uptake')}</th><th>${T('Leaching')}</th><th>${T('NH₃ volatilization')}</th><th>${T('N₂O emission')}</th><th>${T('Total output')}</th><th>${T('Balance')}</th></tr>`;
+  rows.forEach(x=>{h+=`<tr><td>${T(x[0])}</td>${x.slice(1).map((v,j)=>`<td>${v===null?'—':(j===6&&v>=0?'+':'')+f(v)}</td>`).join('')}</tr>`;});
+  h+=`</table><h2>${T('pr_rec')}</h2><table><tr><th>${T('pr_nut')}</th><th>${T('pr_new')}</th><th>${T('pr_prev')}</th><th>${T('pr_adj')}</th></tr>`;
+  recs.forEach(x=>{const adj=x[1]-x[2]; h+=`<tr><td>${T(x[0])}</td><td>${f(Math.max(0,x[1]))}</td><td>${x[2]}</td><td>${(adj>=0?'+':'')+f(adj)}</td></tr>`;});
+  h+=`</table><h2>${T('pr_chart')}</h2><div class="pr-chart">${chartSVG(r,700)}</div><div class="pr-meta">■ <span style="color:#4F6B3A">${T('Crop uptake')}</span> · <span style="color:#3D6E8C">${T('Leaching')}</span> · <span style="color:#a8861d">${T('NH₃ volatilization')}</span> · <span style="color:#9C4F22">${T('N₂O emission')}</span> · | ${T('Total input')}</div>`;
+  h+=`<div class="pr-foot">${T('pr_credit')}<br>https://kamruzzaman17.github.io/NBCtool/ · ${T('pr_link')}: ${scenarioURL()}</div>`;
+  document.getElementById('printReport').innerHTML=h;
+}
+function printReport(){ buildReport(); window.print(); }
+window.addEventListener('beforeprint',()=>{ if(LAST) buildReport(); });
+
+/* ===== Wrap existing UI functions (display only) ===== */
+const _selectCropBase=selectCrop; selectCrop=function(c,b){ _selectCropBase(c,b); applyLang(); };
+const _hideResultsBase=hideResults; hideResults=function(){ _hideResultsBase(); document.getElementById('compareBlock').classList.remove('visible'); };
+
+(function initPrefs(){
+  let th=null, lg=null; try{ th=localStorage.getItem('nbc-theme'); lg=localStorage.getItem('nbc-lang'); }catch(e){}
+  setTheme(th ? th==='dark' : !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches));
+  if(lg==='bn'){ LANG='bn'; }
+  applyLang();
+})();
 
 updateClay();
 loadScenarioFromURL();
